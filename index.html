@@ -82,6 +82,21 @@
         </div>
     </header>
 
+    <!-- Compteurs de Visiteurs -->
+    <div class="flex justify-center gap-4 py-3 bg-slate-800 shadow-inner z-40 border-b border-slate-700">
+        <div class="bg-slate-900 text-blue-400 border border-blue-500/30 px-4 py-1.5 rounded-full font-medium text-sm flex items-center shadow transition-all hover:bg-slate-800">
+            <span class="relative flex h-2.5 w-2.5 mr-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-500"></span>
+            </span>
+            En ligne : <span id="onlineCount" class="ml-2 font-bold text-white text-base">...</span>
+        </div>
+        <div class="bg-slate-900 text-emerald-400 border border-emerald-500/30 px-4 py-1.5 rounded-full font-medium text-sm flex items-center shadow transition-all hover:bg-slate-800">
+            <i class="fa-solid fa-users mr-2"></i>
+            Total visites : <span id="totalCount" class="ml-2 font-bold text-white text-base">...</span>
+        </div>
+    </div>
+
     <!-- Main Dashboard Grid -->
     <div class="max-w-[1800px] mx-auto p-4 md:p-6 space-y-6">
         
@@ -829,6 +844,94 @@
         });
 
         window.onload = updateCalculations;
+    </script>
+
+    <!-- Firebase System pour les Compteurs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, collection, onSnapshot, increment, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'geowall-pro-app';
+        let firebaseConfig = null;
+        
+        try {
+            firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        } catch (e) {
+            console.error("Erreur de configuration Firebase", e);
+        }
+
+        if (firebaseConfig && Object.keys(firebaseConfig).length > 0) {
+            const app = initializeApp(firebaseConfig);
+            const auth = getAuth(app);
+            const db = getFirestore(app);
+
+            const initAuth = async () => {
+                try {
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                } catch (error) {
+                    console.error("Erreur d'authentification:", error);
+                }
+            };
+
+            initAuth();
+
+            onAuthStateChanged(auth, (user) => {
+                if (!user) return;
+
+                const statsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'stats', 'global');
+                const onlineUsersRef = collection(db, 'artifacts', appId, 'public', 'data', 'online_users');
+                const myOnlineDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'online_users', user.uid);
+
+                // Incrémenter le total des visites (une seule fois par session locale)
+                if (!sessionStorage.getItem('hasVisited')) {
+                    setDoc(statsDocRef, { total: increment(1) }, { merge: true }).catch(console.error);
+                    sessionStorage.setItem('hasVisited', 'true');
+                }
+
+                // Écouter le compteur global en temps réel
+                onSnapshot(statsDocRef, (docSnap) => {
+                    if (docSnap.exists() && docSnap.data().total) {
+                        document.getElementById('totalCount').innerText = docSnap.data().total;
+                    }
+                }, (err) => console.error("Erreur de lecture du total:", err));
+
+                // Mettre à jour le statut "En ligne"
+                const updateOnlineStatus = () => {
+                    setDoc(myOnlineDocRef, { lastActive: Date.now() }, { merge: true }).catch(console.error);
+                };
+                
+                updateOnlineStatus(); // Premier appel
+                setInterval(updateOnlineStatus, 30000); // Mise à jour toutes les 30 secondes
+
+                // Supprimer la session si l'utilisateur ferme l'onglet
+                window.addEventListener('beforeunload', () => {
+                    deleteDoc(myOnlineDocRef).catch(console.error);
+                });
+
+                // Écouter les utilisateurs actifs
+                onSnapshot(onlineUsersRef, (snapshot) => {
+                    const now = Date.now();
+                    let count = 0;
+                    snapshot.forEach(d => {
+                        const data = d.data();
+                        // Considérer en ligne s'il y a eu une activité dans les 2 dernières minutes (120000 ms)
+                        if (data.lastActive && (now - data.lastActive) < 120000) {
+                            count++;
+                        }
+                    });
+                    document.getElementById('onlineCount').innerText = count;
+                }, (err) => console.error("Erreur de lecture des utilisateurs en ligne:", err));
+            });
+        } else {
+            // Mode démo si la base de données n'est pas connectée
+            document.getElementById('onlineCount').innerText = "1";
+            document.getElementById('totalCount').innerText = "1";
+        }
     </script>
 </body>
 </html>
