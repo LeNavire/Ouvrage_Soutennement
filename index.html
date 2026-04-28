@@ -1,468 +1,959 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calcul Sismique Mur de Soutènement - RPA 2024 Art 10.4 </title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calcul Sismique Mur de Soutènement - RPA 2024 Art 10.4</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
     <script type="text/javascript">
-    (function(c,l,a,r,i,t,y){
-        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-    })(window, document, "clarity", "script", "wipirc5g9b");
-</script>
+      (function (c, l, a, r, i, t, y) {
+        c[a] =
+          c[a] ||
+          function () {
+            (c[a].q = c[a].q || []).push(arguments);
+          };
+        t = l.createElement(r);
+        t.async = 1;
+        t.src = "https://www.clarity.ms/tag/" + i;
+        y = l.getElementsByTagName(r)[0];
+        y.parentNode.insertBefore(t, y);
+      })(window, document, "clarity", "script", "wipirc5g9b");
+    </script>
     <!-- Ajout de MathJax pour le rendu des équations LaTeX -->
     <script>
-        MathJax = {
-            tex: {inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']]}
-        };
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+      };
     </script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
-    
+    <script
+      id="MathJax-script"
+      async
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+    ></script>
+
     <style>
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: #f1f5f9; }
-        .input-group label { display: block; font-size: 0.875rem; font-weight: 600; color: #475569; margin-bottom: 0.25rem; }
-        .input-group input, .input-group select { 
-            width: 100%; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 0.375rem; 
-            font-size: 0.875rem; transition: all 0.2s; background-color: #f8fafc;
-        }
-        .input-group input:focus, .input-group select:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); background-color: #ffffff;}
-        .card { background: white; border-radius: 0.5rem; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); padding: 1.25rem; }
-        .section-title { font-size: 1.05rem; font-weight: 700; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; margin-bottom: 1rem; }
-        
-        .status-ok { color: #059669; font-weight: bold; background: #d1fae5; padding: 0.2rem 0.5rem; border-radius: 0.25rem; }
-        .status-nok { color: #dc2626; font-weight: bold; background: #fee2e2; padding: 0.2rem 0.5rem; border-radius: 0.25rem; }
-        
-        /* Custom Scrollbar */
-        .custom-scroll::-webkit-scrollbar { width: 6px; }
-        .custom-scroll::-webkit-scrollbar-track { background: #f8fafc; border-radius: 8px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
-        .custom-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+      body {
+        font-family: "Segoe UI", system-ui, sans-serif;
+        background-color: #f1f5f9;
+      }
+      .input-group label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #475569;
+        margin-bottom: 0.25rem;
+      }
+      .input-group input,
+      .input-group select {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 0.375rem;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+        background-color: #f8fafc;
+      }
+      .input-group input:focus,
+      .input-group select:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        background-color: #ffffff;
+      }
+      .card {
+        background: white;
+        border-radius: 0.5rem;
+        box-shadow:
+          0 1px 3px 0 rgba(0, 0, 0, 0.1),
+          0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        padding: 1.25rem;
+      }
+      .section-title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #1e293b;
+        border-bottom: 2px solid #e2e8f0;
+        padding-bottom: 0.5rem;
+        margin-bottom: 1rem;
+      }
 
-        svg { width: 100%; height: 100%; background-color: #ffffff; border-radius: 0.5rem; border: 1px solid #e2e8f0; }
-        .tooltip { position: relative; display: inline-block; cursor: help; color: #3b82f6; margin-left: 0.25rem; }
-        .tooltip .tooltiptext {
-            visibility: hidden; width: 200px; background-color: #1e293b; color: #fff; text-align: center;
-            border-radius: 6px; padding: 5px; position: absolute; z-index: 10; bottom: 125%; left: 50%;
-            margin-left: -100px; opacity: 0; transition: opacity 0.3s; font-size: 0.75rem; font-weight: normal;
-        }
-        .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
-        
-        /* Styles pour le rapport détaillé */
-        .math-container { overflow-x: auto; padding: 0.5rem 0; margin-bottom: 0.5rem; }
-        .details-table th, .details-table td { border: 1px solid #e2e8f0; padding: 0.75rem; text-align: center; }
-        .details-table th { background-color: #f8fafc; font-weight: 600; color: #1e293b; }
-        .details-table tr:hover { background-color: #f1f5f9; }
-        .step-header { font-size: 1.1rem; font-weight: 700; color: #0f172a; margin-top: 1.5rem; margin-bottom: 0.5rem; padding-left: 0.75rem; border-left: 4px solid #3b82f6; background: #f8fafc; padding-top: 0.25rem; padding-bottom: 0.25rem; border-radius: 0 4px 4px 0;}
+      .status-ok {
+        color: #059669;
+        font-weight: bold;
+        background: #d1fae5;
+        padding: 0.2rem 0.5rem;
+        border-radius: 0.25rem;
+      }
+      .status-nok {
+        color: #dc2626;
+        font-weight: bold;
+        background: #fee2e2;
+        padding: 0.2rem 0.5rem;
+        border-radius: 0.25rem;
+      }
+
+      /* Custom Scrollbar */
+      .custom-scroll::-webkit-scrollbar {
+        width: 6px;
+      }
+      .custom-scroll::-webkit-scrollbar-track {
+        background: #f8fafc;
+        border-radius: 8px;
+      }
+      .custom-scroll::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 8px;
+      }
+      .custom-scroll::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+
+      svg {
+        width: 100%;
+        height: 100%;
+        background-color: #ffffff;
+        border-radius: 0.5rem;
+        border: 1px solid #e2e8f0;
+      }
+      .tooltip {
+        position: relative;
+        display: inline-block;
+        cursor: help;
+        color: #3b82f6;
+        margin-left: 0.25rem;
+      }
+      .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 200px;
+        background-color: #1e293b;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px;
+        position: absolute;
+        z-index: 10;
+        bottom: 125%;
+        left: 50%;
+        margin-left: -100px;
+        opacity: 0;
+        transition: opacity 0.3s;
+        font-size: 0.75rem;
+        font-weight: normal;
+      }
+      .tooltip:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+      }
+
+      /* Styles pour le rapport détaillé */
+      .math-container {
+        overflow-x: auto;
+        padding: 0.5rem 0;
+        margin-bottom: 0.5rem;
+      }
+      .details-table th,
+      .details-table td {
+        border: 1px solid #e2e8f0;
+        padding: 0.75rem;
+        text-align: center;
+      }
+      .details-table th {
+        background-color: #f8fafc;
+        font-weight: 600;
+        color: #1e293b;
+      }
+      .details-table tr:hover {
+        background-color: #f1f5f9;
+      }
+      .step-header {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-top: 1.5rem;
+        margin-bottom: 0.5rem;
+        padding-left: 0.75rem;
+        border-left: 4px solid #3b82f6;
+        background: #f8fafc;
+        padding-top: 0.25rem;
+        padding-bottom: 0.25rem;
+        border-radius: 0 4px 4px 0;
+      }
     </style>
-</head>
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-C5HK4PSW5M"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+  </head>
+  <!-- Google tag (gtag.js) -->
+  <script
+    async
+    src="https://www.googletagmanager.com/gtag/js?id=G-C5HK4PSW5M"
+  ></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag("js", new Date());
 
-  gtag('config', 'G-C5HK4PSW5M');
-</script>
-<body class="text-gray-800 font-sans">
-
+    gtag("config", "G-C5HK4PSW5M");
+  </script>
+  <body class="text-gray-800 font-sans">
     <!-- Header -->
     <header class="bg-slate-900 text-white p-4 shadow-md sticky top-0 z-50">
-        <div class="max-w-[1800px] mx-auto flex justify-between items-center">
-            <div>
-                <h1 class="text-2xl font-bold"><i class="fa-solid fa-layer-group text-blue-400 mr-2"></i> GeoWall Pro- |Une conception de Mr.Boudeffa</h1>
-                <p class="text-sm text-slate-300">Vérification de la Stabilité des Murs de Soutènement - RPA 2024 (Art. 10.4) -Situation Accidentelle</p>
-            </div>
-            <div class="text-right text-sm hidden sm:block">
-                <span class="bg-blue-600/20 text-blue-300 border border-blue-500/30 px-3 py-1.5 rounded-full font-medium"><i class="fa-solid fa-check mr-1"></i> Mode Pseudo-Statique</span>
-            </div>
+      <div class="max-w-[1800px] mx-auto flex justify-between items-center">
+        <div>
+          <h1 class="text-2xl font-bold">
+            <i class="fa-solid fa-layer-group text-blue-400 mr-2"></i> GeoWall
+            Pro- |Une conception de Mr.Boudeffa
+          </h1>
+          <p class="text-sm text-slate-300">
+            Vérification de la Stabilité des Murs de Soutènement - RPA 2024
+            (Art. 10.4) -Situation Accidentelle
+          </p>
         </div>
+        <div class="text-right text-sm hidden sm:block">
+          <span
+            class="bg-blue-600/20 text-blue-300 border border-blue-500/30 px-3 py-1.5 rounded-full font-medium"
+            ><i class="fa-solid fa-check mr-1"></i> Mode Pseudo-Statique</span
+          >
+        </div>
+      </div>
     </header>
-
-    <!-- Compteurs de Visiteurs -->
-    <div class="flex justify-center gap-4 py-3 bg-slate-800 shadow-inner z-40 border-b border-slate-700">
-        <div class="bg-slate-900 text-blue-400 border border-blue-500/30 px-4 py-1.5 rounded-full font-medium text-sm flex items-center shadow transition-all hover:bg-slate-800">
-            <span class="relative flex h-2.5 w-2.5 mr-2">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-500"></span>
-            </span>
-            En ligne : <span id="onlineCount" class="ml-2 font-bold text-white text-base">...</span>
-        </div>
-        <div class="bg-slate-900 text-emerald-400 border border-emerald-500/30 px-4 py-1.5 rounded-full font-medium text-sm flex items-center shadow transition-all hover:bg-slate-800">
-            <i class="fa-solid fa-users mr-2"></i>
-            Total visites : <span id="totalCount" class="ml-2 font-bold text-white text-base">...</span>
-        </div>
-    </div>
 
     <!-- Main Dashboard Grid -->
     <div class="max-w-[1800px] mx-auto p-4 md:p-6 space-y-6">
-        
-        <!-- Top Row: 3 Columns -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-12 gap-6 items-start">
-            
-            <!-- COLONNE 1 : Paramètres d'entrée -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 xl:col-span-3 flex flex-col max-h-[85vh]">
-                <div class="bg-slate-50 p-4 border-b border-gray-200 rounded-t-xl sticky top-0 z-10 flex items-center">
-                    <i class="fa-solid fa-sliders text-slate-500 mr-2"></i>
-                    <h2 class="text-lg font-bold text-slate-800">Paramètres d'entrée</h2>
+      <!-- Top Row: 3 Columns -->
+      <div
+        class="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-12 gap-6 items-start"
+      >
+        <!-- COLONNE 1 : Paramètres d'entrée -->
+        <div
+          class="bg-white rounded-xl shadow-sm border border-gray-200 xl:col-span-3 flex flex-col max-h-[85vh]"
+        >
+          <div
+            class="bg-slate-50 p-4 border-b border-gray-200 rounded-t-xl sticky top-0 z-10 flex items-center"
+          >
+            <i class="fa-solid fa-sliders text-slate-500 mr-2"></i>
+            <h2 class="text-lg font-bold text-slate-800">
+              Paramètres d'entrée
+            </h2>
+          </div>
+
+          <div class="p-5 overflow-y-auto custom-scroll">
+            <form id="calcForm" class="space-y-6">
+              <!-- Géométrie du Mur -->
+              <div>
+                <h3 class="font-semibold text-blue-700 mb-3 flex items-center">
+                  <i class="fa-solid fa-ruler-combined mr-2 w-5"></i>Géométrie
+                  du Mur
+                </h3>
+                <div class="grid grid-cols-2 gap-3">
+                  <div class="input-group">
+                    <label>Hauteur, H (m)</label
+                    ><input
+                      type="number"
+                      id="inp_H"
+                      value="6.0"
+                      step="0.1"
+                      min="1"
+                      max="10"
+                    />
+                  </div>
+                  <div class="input-group">
+                    <label>L. Patin, L<sub>p</sub> (m)</label
+                    ><input
+                      type="number"
+                      id="inp_Lp"
+                      value="1.0"
+                      step="0.1"
+                      min="0"
+                    />
+                  </div>
+                  <div class="input-group">
+                    <label>Ép. Voile, E<sub>v</sub> (m)</label
+                    ><input
+                      type="number"
+                      id="inp_Ev"
+                      value="0.4"
+                      step="0.05"
+                      min="0.2"
+                    />
+                  </div>
+                  <div class="input-group">
+                    <label>L. Talon, L<sub>t</sub> (m)</label
+                    ><input
+                      type="number"
+                      id="inp_Lt"
+                      value="2.6"
+                      step="0.1"
+                      min="0"
+                    />
+                  </div>
+                  <div class="input-group">
+                    <label>Ép. Semelle, E<sub>s</sub> (m)</label
+                    ><input
+                      type="number"
+                      id="inp_Es"
+                      value="0.6"
+                      step="0.05"
+                      min="0.2"
+                    />
+                  </div>
+                  <div class="input-group">
+                    <label class="text-gray-400">Base, B (m) (Auto)</label
+                    ><input
+                      type="number"
+                      id="inp_B"
+                      value="4.0"
+                      readonly
+                      class="text-gray-400 bg-gray-50 cursor-not-allowed"
+                    />
+                  </div>
+                  <div class="input-group col-span-2">
+                    <label>Poids vol. Mur, &gamma;<sub>m</sub> (kN/m³)</label
+                    ><input
+                      type="number"
+                      id="inp_gammam"
+                      value="25.0"
+                      step="0.5"
+                    />
+                  </div>
                 </div>
-                
-                <div class="p-5 overflow-y-auto custom-scroll">
-                    <form id="calcForm" class="space-y-6">
-                        <!-- Géométrie du Mur -->
-                        <div>
-                            <h3 class="font-semibold text-blue-700 mb-3 flex items-center"><i class="fa-solid fa-ruler-combined mr-2 w-5"></i>Géométrie du Mur</h3>
-                            <div class="grid grid-cols-2 gap-3">
-                                <div class="input-group"><label>Hauteur, H (m)</label><input type="number" id="inp_H" value="6.0" step="0.1" min="1" max="10"></div>
-                                <div class="input-group"><label>L. Patin, L<sub>p</sub> (m)</label><input type="number" id="inp_Lp" value="1.0" step="0.1" min="0"></div>
-                                <div class="input-group"><label>Ép. Voile, E<sub>v</sub> (m)</label><input type="number" id="inp_Ev" value="0.4" step="0.05" min="0.2"></div>
-                                <div class="input-group"><label>L. Talon, L<sub>t</sub> (m)</label><input type="number" id="inp_Lt" value="2.6" step="0.1" min="0"></div>
-                                <div class="input-group"><label>Ép. Semelle, E<sub>s</sub> (m)</label><input type="number" id="inp_Es" value="0.6" step="0.05" min="0.2"></div>
-                                <div class="input-group"><label class="text-gray-400">Base, B (m) (Auto)</label><input type="number" id="inp_B" value="4.0" readonly class="text-gray-400 bg-gray-50 cursor-not-allowed"></div>
-                                <div class="input-group col-span-2"><label>Poids vol. Mur, &gamma;<sub>m</sub> (kN/m³)</label><input type="number" id="inp_gammam" value="25.0" step="0.5"></div>
-                            </div>
-                        </div>
+              </div>
 
-                        <!-- Propriétés du Sol (Remblai) -->
-                        <div class="pt-4 border-t border-gray-100">
-                            <h3 class="font-semibold text-amber-600 mb-3 flex items-center"><i class="fa-solid fa-mountain mr-2 w-5"></i>Sol Retenu (Remblai)</h3>
-                            <div class="grid grid-cols-2 gap-3">
-                                <div class="input-group"><label>&gamma; (kN/m³)</label><input type="number" id="inp_gamma" value="19.0" step="0.5"></div>
-                                <div class="input-group"><label>Angle &phi;' (°)</label><input type="number" id="inp_phi" value="30" step="1"></div>
-                                <div class="input-group"><label>Frott. &delta; (°)</label><input type="number" id="inp_delta" value="30" step="1"></div>
-                                <div class="input-group"><label>Pente i (°)</label><input type="number" id="inp_i" value="10" step="1"></div>
-                                <div class="input-group col-span-2"><label>Surcharge Uniforme, q (kPa)</label><input type="number" id="inp_q" value="10.0" step="1" min="0"></div>
-                                <div class="input-group col-span-2 hidden"><input type="number" id="inp_beta" value="0" readonly></div>
-                            </div>
-                        </div>
-
-                        <!-- Nappe Phréatique -->
-                        <div class="pt-4 border-t border-gray-100">
-                            <h3 class="font-semibold text-cyan-600 mb-3 flex items-center justify-between">
-                                <span class="flex items-center"><i class="fa-solid fa-water mr-2 w-5"></i>Nappe Phréatique</span>
-                                <input type="checkbox" id="inp_hasWater" class="w-4 h-4 text-cyan-600 rounded" checked>
-                            </h3>
-                            <div id="water_inputs" class="grid grid-cols-2 gap-3 transition-opacity">
-                                <div class="input-group"><label>H<sub>w</sub> (m)</label><input type="number" id="inp_Hw" value="3.0" step="0.1" min="0"></div>
-                                <div class="input-group"><label>&gamma;<sub>sat</sub> (kN/m³)</label><input type="number" id="inp_gamma_sat" value="21.0" step="0.5"></div>
-                                <div class="input-group col-span-2">
-                                    <label>Perméabilité du sol</label>
-                                    <select id="inp_perm">
-                                        <option value="impermeable">Imperméable (k < 10⁻⁴ m/s)</option>
-                                        <option value="permeable">Très perméable (k > 0.1 m/s)</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Butée (Sol à l'avant) -->
-                        <div class="pt-4 border-t border-gray-100">
-                            <h3 class="font-semibold text-emerald-600 mb-3 flex items-center justify-between">
-                                <span class="flex items-center"><i class="fa-solid fa-arrow-right-to-bracket mr-2 w-5"></i>Butée à l'avant</span>
-                                <input type="checkbox" id="inp_hasButee" class="w-4 h-4 text-emerald-600 rounded">
-                            </h3>
-                            <div id="butee_inputs" class="grid grid-cols-2 gap-3 opacity-50 pointer-events-none transition-opacity">
-                                <div class="input-group"><label>Prof., D (m)</label><input type="number" id="inp_D" value="1.0" step="0.1" min="0"></div>
-                                <div class="input-group"><label>Angle &phi;<sub>p</sub> (°)</label><input type="number" id="inp_phi_p" value="30" step="1"></div>
-                            </div>
-                        </div>
-
-                        <!-- Sol de Fondation -->
-                        <div class="pt-4 border-t border-gray-100">
-                            <h3 class="font-semibold text-orange-600 mb-3 flex items-center"><i class="fa-solid fa-grip-lines mr-2 w-5"></i>Sol de Fondation</h3>
-                            <div class="grid grid-cols-2 gap-3">
-                                <div class="input-group"><label>Frottement, &phi;<sub>f</sub> (°)</label><input type="number" id="inp_phif" value="35" step="1"></div>
-                                <div class="input-group"><label>Cohésion, c' (kPa)</label><input type="number" id="inp_c" value="0" step="1"></div>
-                                <div class="input-group col-span-2"><label>&sigma;<sub>adm</sub> (kPa)</label><input type="number" id="inp_qadm" value="300" step="10"></div>
-                            </div>
-                        </div>
-
-                        <!-- Paramètres Sismiques -->
-                        <div class="pt-4 border-t border-gray-100">
-                            <h3 class="font-semibold text-red-600 mb-3 flex items-center"><i class="fa-solid fa-house-crack mr-2 w-5"></i>Paramètres Sismiques</h3>
-                            <div class="grid grid-cols-2 gap-3">
-                                <div class="input-group"><label>k<sub>h</sub> (A.I.S)</label><input type="number" id="inp_kh" value="0.15" step="0.01" min="0" max="0.5"></div>
-                                <div class="input-group"><label>S<sub>T</sub> (Topo)</label><input type="number" id="inp_ST" value="1.0" step="0.05" min="1.0"></div>
-                                <div class="input-group col-span-2">
-                                    <label>Situation Sismique (Type)</label>
-                                    <select id="inp_typeSism">
-                                        <option value="type1">Type 1 (k_v = ± 1/2 k_h)</option>
-                                        <option value="type2">Type 2 (k_v = ± 1/3 k_h)</option>
-                                        <option value="zero">Négligé (k_v = 0)</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
+              <!-- Propriétés du Sol (Remblai) -->
+              <div class="pt-4 border-t border-gray-100">
+                <h3 class="font-semibold text-amber-600 mb-3 flex items-center">
+                  <i class="fa-solid fa-mountain mr-2 w-5"></i>Sol Retenu
+                  (Remblai)
+                </h3>
+                <div class="grid grid-cols-2 gap-3">
+                  <div class="input-group">
+                    <label>&gamma; (kN/m³)</label
+                    ><input
+                      type="number"
+                      id="inp_gamma"
+                      value="19.0"
+                      step="0.5"
+                    />
+                  </div>
+                  <div class="input-group">
+                    <label>Angle &phi;' (°)</label
+                    ><input type="number" id="inp_phi" value="30" step="1" />
+                  </div>
+                  <div class="input-group">
+                    <label>Frott. &delta; (°)</label
+                    ><input type="number" id="inp_delta" value="30" step="1" />
+                  </div>
+                  <div class="input-group">
+                    <label>Pente i (°)</label
+                    ><input type="number" id="inp_i" value="10" step="1" />
+                  </div>
+                  <div class="input-group col-span-2">
+                    <label>Surcharge Uniforme, q (kPa)</label
+                    ><input
+                      type="number"
+                      id="inp_q"
+                      value="10.0"
+                      step="1"
+                      min="0"
+                    />
+                  </div>
+                  <div class="input-group col-span-2 hidden">
+                    <input type="number" id="inp_beta" value="0" readonly />
+                  </div>
                 </div>
-            </div>
+              </div>
 
-            <!-- COLONNE 2 : Visualisation du Modèle -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 xl:col-span-5 flex flex-col min-h-[600px] xl:min-h-[85vh]">
-                <div class="bg-slate-50 p-4 border-b border-gray-200 rounded-t-xl flex items-center">
-                    <i class="fa-solid fa-vector-square text-slate-500 mr-2"></i>
-                    <h2 class="text-lg font-bold text-slate-800">Visualisation du Modèle</h2>
+              <!-- Nappe Phréatique -->
+              <div class="pt-4 border-t border-gray-100">
+                <h3
+                  class="font-semibold text-cyan-600 mb-3 flex items-center justify-between"
+                >
+                  <span class="flex items-center"
+                    ><i class="fa-solid fa-water mr-2 w-5"></i>Nappe
+                    Phréatique</span
+                  >
+                  <input
+                    type="checkbox"
+                    id="inp_hasWater"
+                    class="w-4 h-4 text-cyan-600 rounded"
+                    checked
+                  />
+                </h3>
+                <div
+                  id="water_inputs"
+                  class="grid grid-cols-2 gap-3 transition-opacity"
+                >
+                  <div class="input-group">
+                    <label>H<sub>w</sub> (m)</label
+                    ><input
+                      type="number"
+                      id="inp_Hw"
+                      value="3.0"
+                      step="0.1"
+                      min="0"
+                    />
+                  </div>
+                  <div class="input-group">
+                    <label>&gamma;<sub>sat</sub> (kN/m³)</label
+                    ><input
+                      type="number"
+                      id="inp_gamma_sat"
+                      value="21.0"
+                      step="0.5"
+                    />
+                  </div>
+                  <div class="input-group col-span-2">
+                    <label>Perméabilité du sol</label>
+                    <select id="inp_perm">
+                      <option value="impermeable">
+                        Imperméable (k < 10⁻⁴ m/s)
+                      </option>
+                      <option value="permeable">
+                        Très perméable (k > 0.1 m/s)
+                      </option>
+                    </select>
+                  </div>
                 </div>
-                <div class="p-6 flex-1 relative flex flex-col">
-                    <div class="flex-1 w-full bg-slate-50 rounded border border-slate-100 p-2 shadow-inner">
-                        <svg id="wallSvg" viewBox="0 0 500 500" preserveAspectRatio="xMidYMid meet" class="w-full h-full bg-transparent border-none"></svg>
-                    </div>
-                    <div class="mt-4 text-xs text-slate-500 text-center bg-slate-50 p-2 rounded border border-slate-100">
-                        <i class="fa-solid fa-circle-info mr-1 text-blue-500"></i> Plan virtuel vertical au nu du talon (&beta;=0). Les forces sont représentées sur leurs points d'application réels.
-                    </div>
-                </div>
-            </div>
+              </div>
 
-            <!-- COLONNE 3 : Rapport de Vérification RPA -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 xl:col-span-4 flex flex-col max-h-[85vh]">
-                <div class="bg-slate-50 p-4 border-b border-gray-200 rounded-t-xl sticky top-0 z-10 flex items-center">
-                    <i class="fa-solid fa-clipboard-check text-slate-500 mr-2"></i>
-                    <h2 class="text-lg font-bold text-slate-800">Rapport de Vérification RPA</h2>
+              <!-- Butée (Sol à l'avant) -->
+              <div class="pt-4 border-t border-gray-100">
+                <h3
+                  class="font-semibold text-emerald-600 mb-3 flex items-center justify-between"
+                >
+                  <span class="flex items-center"
+                    ><i class="fa-solid fa-arrow-right-to-bracket mr-2 w-5"></i
+                    >Butée à l'avant</span
+                  >
+                  <input
+                    type="checkbox"
+                    id="inp_hasButee"
+                    class="w-4 h-4 text-emerald-600 rounded"
+                  />
+                </h3>
+                <div
+                  id="butee_inputs"
+                  class="grid grid-cols-2 gap-3 opacity-50 pointer-events-none transition-opacity"
+                >
+                  <div class="input-group">
+                    <label>Prof., D (m)</label
+                    ><input
+                      type="number"
+                      id="inp_D"
+                      value="1.0"
+                      step="0.1"
+                      min="0"
+                    />
+                  </div>
+                  <div class="input-group">
+                    <label>Angle &phi;<sub>p</sub> (°)</label
+                    ><input type="number" id="inp_phi_p" value="30" step="1" />
+                  </div>
                 </div>
-                <div class="p-5 overflow-y-auto custom-scroll bg-slate-50/50" id="resultsContainer">
-                    <!-- Résumé dynamique généré par JS -->
-                </div>
-            </div>
+              </div>
 
+              <!-- Sol de Fondation -->
+              <div class="pt-4 border-t border-gray-100">
+                <h3
+                  class="font-semibold text-orange-600 mb-3 flex items-center"
+                >
+                  <i class="fa-solid fa-grip-lines mr-2 w-5"></i>Sol de
+                  Fondation
+                </h3>
+                <div class="grid grid-cols-2 gap-3">
+                  <div class="input-group">
+                    <label>Frottement, &phi;<sub>f</sub> (°)</label
+                    ><input type="number" id="inp_phif" value="35" step="1" />
+                  </div>
+                  <div class="input-group">
+                    <label>Cohésion, c' (kPa)</label
+                    ><input type="number" id="inp_c" value="0" step="1" />
+                  </div>
+                  <div class="input-group col-span-2">
+                    <label>&sigma;<sub>adm</sub> (kPa)</label
+                    ><input type="number" id="inp_qadm" value="300" step="10" />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Paramètres Sismiques -->
+              <div class="pt-4 border-t border-gray-100">
+                <h3 class="font-semibold text-red-600 mb-3 flex items-center">
+                  <i class="fa-solid fa-house-crack mr-2 w-5"></i>Paramètres
+                  Sismiques
+                </h3>
+                <div class="grid grid-cols-2 gap-3">
+                  <div class="input-group">
+                    <label>k<sub>h</sub> (A.I.S)</label
+                    ><input
+                      type="number"
+                      id="inp_kh"
+                      value="0.15"
+                      step="0.01"
+                      min="0"
+                      max="0.5"
+                    />
+                  </div>
+                  <div class="input-group">
+                    <label>S<sub>T</sub> (Topo)</label
+                    ><input
+                      type="number"
+                      id="inp_ST"
+                      value="1.0"
+                      step="0.05"
+                      min="1.0"
+                    />
+                  </div>
+                  <div class="input-group col-span-2">
+                    <label>Situation Sismique (Type)</label>
+                    <select id="inp_typeSism">
+                      <option value="type1">Type 1 (k_v = ± 1/2 k_h)</option>
+                      <option value="type2">Type 2 (k_v = ± 1/3 k_h)</option>
+                      <option value="zero">Négligé (k_v = 0)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
         </div>
 
-        <!-- ROW 2: Annexe (Pleine largeur) -->
-        <section id="detailsModule" class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 border-t-4 border-t-slate-800">
-            <!-- Contenu dynamique Annexe généré par JS -->
-        </section>
+        <!-- COLONNE 2 : Visualisation du Modèle -->
+        <div
+          class="bg-white rounded-xl shadow-sm border border-gray-200 xl:col-span-5 flex flex-col min-h-[600px] xl:min-h-[85vh]"
+        >
+          <div
+            class="bg-slate-50 p-4 border-b border-gray-200 rounded-t-xl flex items-center"
+          >
+            <i class="fa-solid fa-vector-square text-slate-500 mr-2"></i>
+            <h2 class="text-lg font-bold text-slate-800">
+              Visualisation du Modèle
+            </h2>
+          </div>
+          <div class="p-6 flex-1 relative flex flex-col">
+            <div
+              class="flex-1 w-full bg-slate-50 rounded border border-slate-100 p-2 shadow-inner"
+            >
+              <svg
+                id="wallSvg"
+                viewBox="0 0 500 500"
+                preserveAspectRatio="xMidYMid meet"
+                class="w-full h-full bg-transparent border-none"
+              ></svg>
+            </div>
+            <div
+              class="mt-4 text-xs text-slate-500 text-center bg-slate-50 p-2 rounded border border-slate-100"
+            >
+              <i class="fa-solid fa-circle-info mr-1 text-blue-500"></i> Plan
+              virtuel vertical au nu du talon (&beta;=0). Les forces sont
+              représentées sur leurs points d'application réels.
+            </div>
+          </div>
+        </div>
 
+        <!-- COLONNE 3 : Rapport de Vérification RPA -->
+        <div
+          class="bg-white rounded-xl shadow-sm border border-gray-200 xl:col-span-4 flex flex-col max-h-[85vh]"
+        >
+          <div
+            class="bg-slate-50 p-4 border-b border-gray-200 rounded-t-xl sticky top-0 z-10 flex items-center"
+          >
+            <i class="fa-solid fa-clipboard-check text-slate-500 mr-2"></i>
+            <h2 class="text-lg font-bold text-slate-800">
+              Rapport de Vérification RPA
+            </h2>
+          </div>
+          <div
+            class="p-5 overflow-y-auto custom-scroll bg-slate-50/50"
+            id="resultsContainer"
+          >
+            <!-- Résumé dynamique généré par JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ROW 2: Annexe (Pleine largeur) -->
+      <section
+        id="detailsModule"
+        class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 border-t-4 border-t-slate-800"
+      >
+        <!-- Contenu dynamique Annexe généré par JS -->
+      </section>
     </div>
 
     <script>
-        const G_W = 9.81;
+      const G_W = 9.81;
 
-        const toRad = deg => deg * Math.PI / 180;
-        const toDeg = rad => rad * 180 / Math.PI;
+      const toRad = (deg) => (deg * Math.PI) / 180;
+      const toDeg = (rad) => (rad * 180) / Math.PI;
 
-        function updateCalculations() {
-            // Read Inputs
-            const H = parseFloat(document.getElementById('inp_H').value);
-            const Ev = parseFloat(document.getElementById('inp_Ev').value);
-            const Es = parseFloat(document.getElementById('inp_Es').value);
-            const Lp = parseFloat(document.getElementById('inp_Lp').value);
-            const Lt = parseFloat(document.getElementById('inp_Lt').value);
-            const gamma_m = parseFloat(document.getElementById('inp_gammam').value);
+      function updateCalculations() {
+        // Read Inputs
+        const H = parseFloat(document.getElementById("inp_H").value);
+        const Ev = parseFloat(document.getElementById("inp_Ev").value);
+        const Es = parseFloat(document.getElementById("inp_Es").value);
+        const Lp = parseFloat(document.getElementById("inp_Lp").value);
+        const Lt = parseFloat(document.getElementById("inp_Lt").value);
+        const gamma_m = parseFloat(document.getElementById("inp_gammam").value);
 
-            const B = Lp + Ev + Lt;
-            document.getElementById('inp_B').value = B.toFixed(2);
+        const B = Lp + Ev + Lt;
+        document.getElementById("inp_B").value = B.toFixed(2);
 
-            const gamma = parseFloat(document.getElementById('inp_gamma').value);
-            const phi = parseFloat(document.getElementById('inp_phi').value);
-            const delta = parseFloat(document.getElementById('inp_delta').value);
-            const i_ang = parseFloat(document.getElementById('inp_i').value);
-            const q = parseFloat(document.getElementById('inp_q').value);
-            const beta = parseFloat(document.getElementById('inp_beta').value);
+        const gamma = parseFloat(document.getElementById("inp_gamma").value);
+        const phi = parseFloat(document.getElementById("inp_phi").value);
+        const delta = parseFloat(document.getElementById("inp_delta").value);
+        const i_ang = parseFloat(document.getElementById("inp_i").value);
+        const q = parseFloat(document.getElementById("inp_q").value);
+        const beta = parseFloat(document.getElementById("inp_beta").value);
 
-            const phif = parseFloat(document.getElementById('inp_phif').value);
-            const c = parseFloat(document.getElementById('inp_c').value);
-            const qadm = parseFloat(document.getElementById('inp_qadm').value);
+        const phif = parseFloat(document.getElementById("inp_phif").value);
+        const c = parseFloat(document.getElementById("inp_c").value);
+        const qadm = parseFloat(document.getElementById("inp_qadm").value);
 
-            let kh_base = parseFloat(document.getElementById('inp_kh').value);
-            let ST = parseFloat(document.getElementById('inp_ST').value);
-            let typeSism = document.getElementById('inp_typeSism').value;
+        let kh_base = parseFloat(document.getElementById("inp_kh").value);
+        let ST = parseFloat(document.getElementById("inp_ST").value);
+        let typeSism = document.getElementById("inp_typeSism").value;
 
-            const hasWater = document.getElementById('inp_hasWater').checked;
-            const Hw = Math.min(parseFloat(document.getElementById('inp_Hw').value), H);
-            const gamma_sat = parseFloat(document.getElementById('inp_gamma_sat').value);
-            const perm = document.getElementById('inp_perm').value;
+        const hasWater = document.getElementById("inp_hasWater").checked;
+        const Hw = Math.min(
+          parseFloat(document.getElementById("inp_Hw").value),
+          H,
+        );
+        const gamma_sat = parseFloat(
+          document.getElementById("inp_gamma_sat").value,
+        );
+        const perm = document.getElementById("inp_perm").value;
 
-            const hasButee = document.getElementById('inp_hasButee').checked;
-            const D = parseFloat(document.getElementById('inp_D').value);
-            const phi_p = parseFloat(document.getElementById('inp_phi_p').value);
+        const hasButee = document.getElementById("inp_hasButee").checked;
+        const D = parseFloat(document.getElementById("inp_D").value);
+        const phi_p = parseFloat(document.getElementById("inp_phi_p").value);
 
-            if (Lt < 0) {
-                document.getElementById('resultsContainer').innerHTML = `<div class="text-red-500 font-bold p-4 bg-red-50 rounded border border-red-200"><i class="fa-solid fa-triangle-exclamation mr-2"></i>Erreur Géométrique : B est trop petit.</div>`;
-                return;
-            }
-
-            // Étape 1 : Calcul Kh, Kv
-            let kh = kh_base * ST;
-            let kv_factor = 0;
-            if (typeSism === 'type1') kv_factor = 0.5;
-            else if (typeSism === 'type2') kv_factor = 1/3;
-            
-            // Étape 7 : Si eau, calcul gamma_eq, gamma_sat_eq pour theta
-            let gamma_eq = gamma;
-            let gamma_sat_eq = gamma;
-            let theta_multiplier = 1;
-            
-            if (hasWater && Hw > 0) {
-                let hw_ratio_sq = Math.pow(Hw / H, 2);
-                let gamma_sub = gamma_sat - G_W;
-                gamma_eq = hw_ratio_sq * gamma_sub + (1 - hw_ratio_sq) * gamma;
-                gamma_sat_eq = hw_ratio_sq * gamma_sat + (1 - hw_ratio_sq) * gamma;
-                theta_multiplier = gamma_sat_eq / gamma_eq;
-            }
-
-            // Helper for Kae
-            function calcKae(theta_rad) {
-                let phi_r = toRad(phi); let delta_r = toRad(delta);
-                let beta_r = toRad(beta); let i_r = toRad(i_ang);
-                let K = 0; let eqUsed = "";
-
-                if (theta_rad <= (phi_r - i_r)) {
-                    eqUsed = "10.28";
-                    let num1 = Math.pow(Math.cos(phi_r - theta_rad - beta_r), 2);
-                    let den1 = Math.cos(theta_rad) * Math.pow(Math.cos(beta_r), 2) * Math.cos(delta_r + beta_r + theta_rad);
-                    let num2 = Math.sin(phi_r + delta_r) * Math.sin(phi_r - theta_rad - i_r);
-                    let den2 = Math.cos(delta_r + beta_r + theta_rad) * Math.cos(beta_r - i_r);
-                    let innerSqrt = num2 / den2;
-                    K = num1 / (den1 * Math.pow(1 + Math.sqrt(Math.max(0, innerSqrt)), 2));
-                } else {
-                    eqUsed = "10.29";
-                    let num = Math.pow(Math.cos(i_r - beta_r), 2);
-                    let den = Math.cos(phi_r - i_r) * Math.pow(Math.cos(beta_r), 2) * Math.cos(delta_r + beta_r + phi_r - i_r);
-                    K = num / den;
-                }
-                return { K, eqUsed };
-            }
-
-            // Étape 2 & 3 : Calcul theta, Kae
-            let kv_plus = kv_factor * kh;
-            let kv_minus = -kv_factor * kh;
-            
-            let theta_plus = Math.atan(theta_multiplier * (kh / (1 + kv_plus)));
-            let theta_minus = Math.atan(theta_multiplier * (kh / (1 + kv_minus))); 
-            
-            let res_plus = calcKae(theta_plus);
-            let res_minus = calcKae(theta_minus);
-            
-            // Selection du cas défavorable
-            let res_crit, kv_crit, theta_rad, theta_deg;
-            if (res_plus.K > res_minus.K) {
-                res_crit = res_plus; kv_crit = kv_plus; theta_rad = theta_plus;
-            } else {
-                res_crit = res_minus; kv_crit = kv_minus; theta_rad = theta_minus;
-            }
-            let Kae = res_crit.K;
-            theta_deg = toDeg(theta_rad);
-
-            // Étape 8 & 10 : Calcul Ka statique
-            let res_static = calcKae(0);
-            let Ka = res_static.K;
-
-            // Étape 4, 5, 6 : Calcul Pae, Pwd, Pws
-            let term_q = 1 + (2 * q * Math.cos(toRad(beta))) / (gamma_eq * H * Math.cos(toRad(beta - i_ang)));
-            let Pae = 0.5 * gamma_eq * term_q * Math.pow(H, 2) * (1 + kv_crit) * Kae;
-            let Pa = 0.5 * gamma_eq * term_q * Math.pow(H, 2) * Ka;
-
-            let Pws = 0; let Pwd = 0; let h_pws = 0; let h_pwd = 0;
-            if (hasWater && Hw > 0) {
-                Pws = 0.5 * G_W * Math.pow(Hw, 2);
-                h_pws = Hw / 3;
-                if (perm === 'impermeable') {
-                    Pwd = (7/12) * kh * G_W * Math.pow(Hw, 2);
-                    h_pwd = 0.6 * Hw; // 3/5 Hw
-                }
-            }
-
-            // Étape 9 & 11 : Points d'application
-            let hae = H * (0.5 - (1/6) * (Pa / Pae));
-            if (isNaN(hae) || Pae === 0) hae = H / 3;
-
-            // Étape 12 : Pad (Forces composantes)
-            let Pae_h = Pae * Math.cos(toRad(delta + beta));
-            let Pae_v = Pae * Math.sin(toRad(delta + beta));
-
-            let Pad_h = Pae_h + Pws + Pwd;
-            let Pad_v = Pae_v; 
-
-            // --- BUTÉE DYNAMIQUE (Pdp) ---
-            let Kpe = 0, Ppe = 0, hpe = 0, Ppd_h = 0, eqUsed_pe = "";
-            let theta_p = 0;
-            if (hasButee && D > 0) {
-                let phi_pr = toRad(phi_p); let delta_pr = phi_pr / 2;
-                theta_p = theta_rad; 
-                if (theta_p <= phi_pr) {
-                    eqUsed_pe = "10.32";
-                    let num = Math.pow(Math.cos(phi_pr - theta_p), 2);
-                    let den1 = Math.cos(theta_p) * Math.cos(delta_pr + theta_p);
-                    let innerSqrt = (Math.sin(phi_pr + delta_pr) * Math.sin(phi_pr - theta_p)) / (Math.cos(delta_pr + theta_p));
-                    Kpe = num / (den1 * Math.pow(1 - Math.sqrt(Math.max(0, innerSqrt)), 2));
-                } else {
-                    eqUsed_pe = "10.33";
-                    let num = 1;
-                    let den = Math.cos(phi_pr) * Math.cos(delta_pr + phi_pr);
-                    Kpe = num / den;
-                }
-                Ppe = 0.5 * gamma * Math.pow(D, 2) * (1 - Math.abs(kv_crit)) * Kpe;
-                hpe = D / 3;
-                Ppd_h = Ppe * Math.cos(delta_pr);
-            }
-
-            // STABILITÉ GLOBALE
-            let H_voile = H - Es;
-            let W_voile = Ev * H_voile * gamma_m; let x_voile = Lp + Ev / 2; let y_voile = Es + H_voile / 2;
-            let W_semelle = B * Es * gamma_m; let x_semelle = B / 2; let y_semelle = Es / 2;
-
-            let H_soil_avg = H_voile + (Lt * Math.tan(toRad(i_ang))) / 2; 
-            let W_soil = Lt * H_soil_avg * gamma; let x_soil = B - Lt / 2; let y_soil = Es + H_soil_avg / 2;
-
-            let W_total = W_voile + W_semelle + W_soil;
-            let W_q = q * Lt; let x_q = B - Lt / 2;
-            W_total += W_q;
-            
-            let x_g = (W_voile * x_voile + W_semelle * x_semelle + W_soil * x_soil + W_q * x_q) / W_total;
-            let y_g = (W_voile * y_voile + W_semelle * y_semelle + W_soil * y_soil) / W_total;
-
-            // Force Inertielle
-            let F_ir = kh * W_total;
-            
-            let F_drive_h = Pad_h + F_ir;
-            
-            let V_sliding = W_total * (1 - Math.abs(kv_factor*kh)) + Pae_v;
-            let R_slide = V_sliding * Math.tan(toRad(phif)) + c * B + Ppd_h;
-            let FS_slide = R_slide / F_drive_h;
-
-            let M_drive = Pae_h * hae + F_ir * y_g + Pws * h_pws + Pwd * h_pwd;
-            let M_resist_exact = W_voile*(1 - Math.abs(kv_factor*kh))*x_voile 
-                               + W_semelle*(1 - Math.abs(kv_factor*kh))*x_semelle 
-                               + W_soil*(1 - Math.abs(kv_factor*kh))*x_soil 
-                               + W_q*(1 - Math.abs(kv_factor*kh))*x_q
-                               + Pae_v * B + Ppd_h * hpe;
-            let FS_overturn = M_resist_exact / M_drive;
-
-            let V_bearing = W_total * (1 + Math.abs(kv_factor*kh)) + Pae_v; 
-            let M_resist_bearing = W_voile*(1 + Math.abs(kv_factor*kh))*x_voile 
-                                 + W_semelle*(1 + Math.abs(kv_factor*kh))*x_semelle 
-                                 + W_soil*(1 + Math.abs(kv_factor*kh))*x_soil
-                                 + W_q*(1 + Math.abs(kv_factor*kh))*x_q
-                                 + Pae_v * B + Ppd_h * hpe;
-            let M_net = M_resist_bearing - M_drive;
-            let e = (B / 2) - (M_net / V_bearing);
-            
-            let q_max;
-            if (e <= B / 6) q_max = (V_bearing / B) * (1 + (6 * Math.abs(e)) / B);
-            else q_max = (2 * V_bearing) / (3 * (B / 2 - Math.abs(e)));
-
-            let details = {
-                H, B, Ev, Es, Lp, Lt, gamma_m, gamma, phi, delta, i_ang, q, beta, phif, c, qadm,
-                kh_base, ST, typeSism, kh, kv_factor, kv_crit, 
-                theta_rad, theta_deg, eqUsed: res_crit.eqUsed,
-                gamma_eq, gamma_sat_eq, hasWater, Hw, Pws, Pwd, perm, h_pws, h_pwd,
-                hasButee, D, phi_p, Kpe, Ppe, Ppd_h, hpe, eqUsed_pe,
-                Ka, Kae, term_q, Pa, Pae, hae, Pae_h, Pae_v, Pad_h, Pad_v,
-                W_voile, x_voile, y_voile, W_semelle, x_semelle, y_semelle,
-                W_soil, x_soil, y_soil, W_q, x_q,
-                W_total, x_g, y_g, F_ir, F_drive_h, V_sliding, R_slide, FS_slide,
-                M_drive, M_resist_exact, M_resist_bearing, FS_overturn, V_bearing, e, q_max
-            };
-
-            renderResults(details);
-            drawWall(H, B, Ev, Es, Lp, Lt, hae, Pae, x_g, y_g, hasWater, Hw, hasButee, D, q, i_ang, Pws, Pwd);
-            renderDetailedReport(details);
+        if (Lt < 0) {
+          document.getElementById("resultsContainer").innerHTML =
+            `<div class="text-red-500 font-bold p-4 bg-red-50 rounded border border-red-200"><i class="fa-solid fa-triangle-exclamation mr-2"></i>Erreur Géométrique : B est trop petit.</div>`;
+          return;
         }
 
-        function renderResults(res) {
-            let html = `
+        // Étape 1 : Calcul Kh, Kv
+        let kh = kh_base * ST;
+        let kv_factor = 0;
+        if (typeSism === "type1") kv_factor = 0.5;
+        else if (typeSism === "type2") kv_factor = 1 / 3;
+
+        // Étape 7 : Si eau, calcul gamma_eq, gamma_sat_eq pour theta
+        let gamma_eq = gamma;
+        let gamma_sat_eq = gamma;
+        let theta_multiplier = 1;
+
+        if (hasWater && Hw > 0) {
+          let hw_ratio_sq = Math.pow(Hw / H, 2);
+          let gamma_sub = gamma_sat - G_W;
+          gamma_eq = hw_ratio_sq * gamma_sub + (1 - hw_ratio_sq) * gamma;
+          gamma_sat_eq = hw_ratio_sq * gamma_sat + (1 - hw_ratio_sq) * gamma;
+          theta_multiplier = gamma_sat_eq / gamma_eq;
+        }
+
+        // Helper for Kae
+        function calcKae(theta_rad) {
+          let phi_r = toRad(phi);
+          let delta_r = toRad(delta);
+          let beta_r = toRad(beta);
+          let i_r = toRad(i_ang);
+          let K = 0;
+          let eqUsed = "";
+
+          if (theta_rad <= phi_r - i_r) {
+            eqUsed = "10.28";
+            let num1 = Math.pow(Math.cos(phi_r - theta_rad - beta_r), 2);
+            let den1 =
+              Math.cos(theta_rad) *
+              Math.pow(Math.cos(beta_r), 2) *
+              Math.cos(delta_r + beta_r + theta_rad);
+            let num2 =
+              Math.sin(phi_r + delta_r) * Math.sin(phi_r - theta_rad - i_r);
+            let den2 =
+              Math.cos(delta_r + beta_r + theta_rad) * Math.cos(beta_r - i_r);
+            let innerSqrt = num2 / den2;
+            K =
+              num1 /
+              (den1 * Math.pow(1 + Math.sqrt(Math.max(0, innerSqrt)), 2));
+          } else {
+            eqUsed = "10.29";
+            let num = Math.pow(Math.cos(i_r - beta_r), 2);
+            let den =
+              Math.cos(phi_r - i_r) *
+              Math.pow(Math.cos(beta_r), 2) *
+              Math.cos(delta_r + beta_r + phi_r - i_r);
+            K = num / den;
+          }
+          return { K, eqUsed };
+        }
+
+        // Étape 2 & 3 : Calcul theta, Kae
+        let kv_plus = kv_factor * kh;
+        let kv_minus = -kv_factor * kh;
+
+        let theta_plus = Math.atan(theta_multiplier * (kh / (1 + kv_plus)));
+        let theta_minus = Math.atan(theta_multiplier * (kh / (1 + kv_minus)));
+
+        let res_plus = calcKae(theta_plus);
+        let res_minus = calcKae(theta_minus);
+
+        // Selection du cas défavorable
+        let res_crit, kv_crit, theta_rad, theta_deg;
+        if (res_plus.K > res_minus.K) {
+          res_crit = res_plus;
+          kv_crit = kv_plus;
+          theta_rad = theta_plus;
+        } else {
+          res_crit = res_minus;
+          kv_crit = kv_minus;
+          theta_rad = theta_minus;
+        }
+        let Kae = res_crit.K;
+        theta_deg = toDeg(theta_rad);
+
+        // Étape 8 & 10 : Calcul Ka statique
+        let res_static = calcKae(0);
+        let Ka = res_static.K;
+
+        // Étape 4, 5, 6 : Calcul Pae, Pwd, Pws
+        let term_q =
+          1 +
+          (2 * q * Math.cos(toRad(beta))) /
+            (gamma_eq * H * Math.cos(toRad(beta - i_ang)));
+        let Pae =
+          0.5 * gamma_eq * term_q * Math.pow(H, 2) * (1 + kv_crit) * Kae;
+        let Pa = 0.5 * gamma_eq * term_q * Math.pow(H, 2) * Ka;
+
+        let Pws = 0;
+        let Pwd = 0;
+        let h_pws = 0;
+        let h_pwd = 0;
+        if (hasWater && Hw > 0) {
+          Pws = 0.5 * G_W * Math.pow(Hw, 2);
+          h_pws = Hw / 3;
+          if (perm === "impermeable") {
+            Pwd = (7 / 12) * kh * G_W * Math.pow(Hw, 2);
+            h_pwd = 0.6 * Hw; // 3/5 Hw
+          }
+        }
+
+        // Étape 9 & 11 : Points d'application
+        let hae = H * (0.5 - (1 / 6) * (Pa / Pae));
+        if (isNaN(hae) || Pae === 0) hae = H / 3;
+
+        // Étape 12 : Pad (Forces composantes)
+        let Pae_h = Pae * Math.cos(toRad(delta + beta));
+        let Pae_v = Pae * Math.sin(toRad(delta + beta));
+
+        let Pad_h = Pae_h + Pws + Pwd;
+        let Pad_v = Pae_v;
+
+        // --- BUTÉE DYNAMIQUE (Pdp) ---
+        let Kpe = 0,
+          Ppe = 0,
+          hpe = 0,
+          Ppd_h = 0,
+          eqUsed_pe = "";
+        let theta_p = 0;
+        if (hasButee && D > 0) {
+          let phi_pr = toRad(phi_p);
+          let delta_pr = phi_pr / 2;
+          theta_p = theta_rad;
+          if (theta_p <= phi_pr) {
+            eqUsed_pe = "10.32";
+            let num = Math.pow(Math.cos(phi_pr - theta_p), 2);
+            let den1 = Math.cos(theta_p) * Math.cos(delta_pr + theta_p);
+            let innerSqrt =
+              (Math.sin(phi_pr + delta_pr) * Math.sin(phi_pr - theta_p)) /
+              Math.cos(delta_pr + theta_p);
+            Kpe =
+              num / (den1 * Math.pow(1 - Math.sqrt(Math.max(0, innerSqrt)), 2));
+          } else {
+            eqUsed_pe = "10.33";
+            let num = 1;
+            let den = Math.cos(phi_pr) * Math.cos(delta_pr + phi_pr);
+            Kpe = num / den;
+          }
+          Ppe = 0.5 * gamma * Math.pow(D, 2) * (1 - Math.abs(kv_crit)) * Kpe;
+          hpe = D / 3;
+          Ppd_h = Ppe * Math.cos(delta_pr);
+        }
+
+        // STABILITÉ GLOBALE
+        let H_voile = H - Es;
+        let W_voile = Ev * H_voile * gamma_m;
+        let x_voile = Lp + Ev / 2;
+        let y_voile = Es + H_voile / 2;
+        let W_semelle = B * Es * gamma_m;
+        let x_semelle = B / 2;
+        let y_semelle = Es / 2;
+
+        let H_soil_avg = H_voile + (Lt * Math.tan(toRad(i_ang))) / 2;
+        let W_soil = Lt * H_soil_avg * gamma;
+        let x_soil = B - Lt / 2;
+        let y_soil = Es + H_soil_avg / 2;
+
+        let W_total = W_voile + W_semelle + W_soil;
+        let W_q = q * Lt;
+        let x_q = B - Lt / 2;
+        W_total += W_q;
+
+        let x_g =
+          (W_voile * x_voile +
+            W_semelle * x_semelle +
+            W_soil * x_soil +
+            W_q * x_q) /
+          W_total;
+        let y_g =
+          (W_voile * y_voile + W_semelle * y_semelle + W_soil * y_soil) /
+          W_total;
+
+        // Force Inertielle
+        let F_ir = kh * W_total;
+
+        let F_drive_h = Pad_h + F_ir;
+
+        let V_sliding = W_total * (1 - Math.abs(kv_factor * kh)) + Pae_v;
+        let R_slide = V_sliding * Math.tan(toRad(phif)) + c * B + Ppd_h;
+        let FS_slide = R_slide / F_drive_h;
+
+        let M_drive = Pae_h * hae + F_ir * y_g + Pws * h_pws + Pwd * h_pwd;
+        let M_resist_exact =
+          W_voile * (1 - Math.abs(kv_factor * kh)) * x_voile +
+          W_semelle * (1 - Math.abs(kv_factor * kh)) * x_semelle +
+          W_soil * (1 - Math.abs(kv_factor * kh)) * x_soil +
+          W_q * (1 - Math.abs(kv_factor * kh)) * x_q +
+          Pae_v * B +
+          Ppd_h * hpe;
+        let FS_overturn = M_resist_exact / M_drive;
+
+        let V_bearing = W_total * (1 + Math.abs(kv_factor * kh)) + Pae_v;
+        let M_resist_bearing =
+          W_voile * (1 + Math.abs(kv_factor * kh)) * x_voile +
+          W_semelle * (1 + Math.abs(kv_factor * kh)) * x_semelle +
+          W_soil * (1 + Math.abs(kv_factor * kh)) * x_soil +
+          W_q * (1 + Math.abs(kv_factor * kh)) * x_q +
+          Pae_v * B +
+          Ppd_h * hpe;
+        let M_net = M_resist_bearing - M_drive;
+        let e = B / 2 - M_net / V_bearing;
+
+        let q_max;
+        if (e <= B / 6) q_max = (V_bearing / B) * (1 + (6 * Math.abs(e)) / B);
+        else q_max = (2 * V_bearing) / (3 * (B / 2 - Math.abs(e)));
+
+        let details = {
+          H,
+          B,
+          Ev,
+          Es,
+          Lp,
+          Lt,
+          gamma_m,
+          gamma,
+          phi,
+          delta,
+          i_ang,
+          q,
+          beta,
+          phif,
+          c,
+          qadm,
+          kh_base,
+          ST,
+          typeSism,
+          kh,
+          kv_factor,
+          kv_crit,
+          theta_rad,
+          theta_deg,
+          eqUsed: res_crit.eqUsed,
+          gamma_eq,
+          gamma_sat_eq,
+          hasWater,
+          Hw,
+          Pws,
+          Pwd,
+          perm,
+          h_pws,
+          h_pwd,
+          hasButee,
+          D,
+          phi_p,
+          Kpe,
+          Ppe,
+          Ppd_h,
+          hpe,
+          eqUsed_pe,
+          Ka,
+          Kae,
+          term_q,
+          Pa,
+          Pae,
+          hae,
+          Pae_h,
+          Pae_v,
+          Pad_h,
+          Pad_v,
+          W_voile,
+          x_voile,
+          y_voile,
+          W_semelle,
+          x_semelle,
+          y_semelle,
+          W_soil,
+          x_soil,
+          y_soil,
+          W_q,
+          x_q,
+          W_total,
+          x_g,
+          y_g,
+          F_ir,
+          F_drive_h,
+          V_sliding,
+          R_slide,
+          FS_slide,
+          M_drive,
+          M_resist_exact,
+          M_resist_bearing,
+          FS_overturn,
+          V_bearing,
+          e,
+          q_max,
+        };
+
+        renderResults(details);
+        drawWall(
+          H,
+          B,
+          Ev,
+          Es,
+          Lp,
+          Lt,
+          hae,
+          Pae,
+          x_g,
+          y_g,
+          hasWater,
+          Hw,
+          hasButee,
+          D,
+          q,
+          i_ang,
+          Pws,
+          Pwd,
+        );
+        renderDetailedReport(details);
+      }
+
+      function renderResults(res) {
+        let html = `
                 <div class="card mb-4 border-l-4 border-blue-500 shadow-sm">
                     <h3 class="section-title text-blue-800 border-none mb-1 pb-0">1. Poussées & Hydrodynamique</h3>
                     <hr class="border-blue-100 mb-3">
@@ -472,213 +963,424 @@
                         
                         <div class="col-span-2 border-t border-slate-100 my-1"></div>
                         <div class="text-slate-600">Poussée Dyn. P<sub>ae</sub> :</div><div class="font-mono text-right font-bold text-red-600">${res.Pae.toFixed(1)} kN/m</div>
-                        ${res.hasWater ? `
+                        ${
+                          res.hasWater
+                            ? `
                         <div class="text-slate-600">Poussée Eau P<sub>ws</sub> :</div><div class="font-mono text-right text-cyan-600">${res.Pws.toFixed(1)} kN/m</div>
                         <div class="text-slate-600">Hydrodyn. P<sub>wd</sub> :</div><div class="font-mono text-right text-cyan-600">${res.Pwd.toFixed(1)} kN/m</div>
-                        ` : ''}
+                        `
+                            : ""
+                        }
                         
                         <div class="col-span-2 border-t border-dashed border-slate-200 my-1"></div>
                         <div class="text-slate-700 font-semibold">Résultante Horiz. P<sub>ad,h</sub> :</div><div class="font-mono text-right font-bold text-purple-700 text-base">${res.Pad_h.toFixed(1)} kN/m</div>
                         
-                        ${res.hasButee ? `
+                        ${
+                          res.hasButee
+                            ? `
                         <div class="col-span-2 border-t border-slate-100 my-1"></div>
                         <div class="text-slate-600">Butée P<sub>pe</sub> :</div><div class="font-mono text-right text-emerald-600">${res.Ppe.toFixed(1)} kN/m</div>
-                        ` : ''}
+                        `
+                            : ""
+                        }
                     </div>
                 </div>
 
-                <div class="card mb-4 border-l-4 ${res.FS_slide >= 1.25 ? 'border-green-500' : 'border-red-500'} shadow-sm transition-all">
+                <div class="card mb-4 border-l-4 ${res.FS_slide >= 1.25 ? "border-green-500" : "border-red-500"} shadow-sm transition-all">
                     <h3 class="section-title text-slate-800 border-none mb-1 pb-0">2. Stabilité au Glissement</h3>
                     <hr class="border-slate-100 mb-3">
                     <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-lg border border-slate-200">
                         <span class="font-semibold text-slate-700">FS Glissement :</span>
-                        <span class="${res.FS_slide >= 1.25 ? 'status-ok' : 'status-nok'} text-sm shadow-sm">${res.FS_slide.toFixed(2)} &ge; 1.25</span>
+                        <span class="${res.FS_slide >= 1.25 ? "status-ok" : "status-nok"} text-sm shadow-sm">${res.FS_slide.toFixed(2)} &ge; 1.25</span>
                     </div>
                 </div>
 
-                <div class="card mb-4 border-l-4 ${res.FS_overturn >= 1.3 ? 'border-green-500' : 'border-red-500'} shadow-sm transition-all">
+                <div class="card mb-4 border-l-4 ${res.FS_overturn >= 1.3 ? "border-green-500" : "border-red-500"} shadow-sm transition-all">
                     <h3 class="section-title text-slate-800 border-none mb-1 pb-0">3. Stabilité au Renversement</h3>
                     <hr class="border-slate-100 mb-3">
                     <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-lg border border-slate-200">
                         <span class="font-semibold text-slate-700">FS Renversement :</span>
-                        <span class="${res.FS_overturn >= 1.3 ? 'status-ok' : 'status-nok'} text-sm shadow-sm">${res.FS_overturn.toFixed(2)} &ge; 1.30</span>
+                        <span class="${res.FS_overturn >= 1.3 ? "status-ok" : "status-nok"} text-sm shadow-sm">${res.FS_overturn.toFixed(2)} &ge; 1.30</span>
                     </div>
                 </div>
 
-                <div class="card border-l-4 ${res.q_max <= res.qadm ? 'border-green-500' : 'border-red-500'} shadow-sm transition-all">
+                <div class="card border-l-4 ${res.q_max <= res.qadm ? "border-green-500" : "border-red-500"} shadow-sm transition-all">
                     <h3 class="section-title text-slate-800 border-none mb-1 pb-0">4. Capacité Portante</h3>
                     <hr class="border-slate-100 mb-3">
                     <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-lg border border-slate-200">
                         <span class="font-semibold text-slate-700">&sigma;<sub>max</sub> &le; &sigma;<sub>adm</sub> :</span>
-                        <span class="${res.q_max <= res.qadm ? 'status-ok' : 'status-nok'} text-sm shadow-sm">${res.q_max.toFixed(0)} &le; ${res.qadm}</span>
+                        <span class="${res.q_max <= res.qadm ? "status-ok" : "status-nok"} text-sm shadow-sm">${res.q_max.toFixed(0)} &le; ${res.qadm}</span>
                     </div>
                 </div>
             `;
-            document.getElementById('resultsContainer').innerHTML = html;
+        document.getElementById("resultsContainer").innerHTML = html;
+      }
+
+      function drawWall(
+        H,
+        B,
+        Ev,
+        Es,
+        Lp,
+        Lt,
+        hae,
+        Pae,
+        x_g,
+        y_g,
+        hasWater,
+        Hw,
+        hasButee,
+        D,
+        q,
+        i_ang,
+        Pws,
+        Pwd,
+      ) {
+        const svg = document.getElementById("wallSvg");
+        svg.innerHTML = "";
+
+        const padding = 60;
+        const maxDimY = Math.max(H + Math.tan(toRad(i_ang)) * Lt + 1, Hw);
+        const maxDimX = Math.max(B + 2, B);
+        const maxDim = Math.max(maxDimY, maxDimX);
+        const scale = (500 - 2 * padding) / maxDim;
+        const oX = padding + 20;
+        const oY = 500 - padding;
+        const p = (x, y) => ({ x: oX + x * scale, y: oY - y * scale });
+
+        const pToe = p(0, 0);
+        const pHeel = p(B, 0);
+        const pHeelTop = p(B, Es);
+        const pStemBR = p(Lp + Ev, Es);
+        const pStemTR = p(Lp + Ev, H);
+        const pStemTL = p(Lp, H);
+        const pStemBL = p(Lp, Es);
+        const pToeTop = p(0, Es);
+
+        const pSoilSurfHeel = p(B, H + Math.tan(toRad(i_ang)) * Lt);
+
+        // Soil background
+        const soil = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "polygon",
+        );
+        soil.setAttribute(
+          "points",
+          `${pStemBR.x},${pStemBR.y} ${pHeelTop.x},${pHeelTop.y} ${pHeelTop.x},${pSoilSurfHeel.y} ${pStemTR.x},${pStemTR.y}`,
+        );
+        soil.setAttribute("fill", "#fef3c7");
+        soil.setAttribute("stroke", "#fcd34d");
+        svg.appendChild(soil);
+
+        // Draw Water
+        if (hasWater && Hw > 0) {
+          const pWaterSurf = p(B, Hw);
+          const water = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "polygon",
+          );
+          water.setAttribute(
+            "points",
+            `${pStemBR.x},${Math.max(pWaterSurf.y, pStemTR.y)} ${pWaterSurf.x},${pWaterSurf.y} ${pHeelTop.x},${pHeelTop.y} ${pStemBR.x},${pStemBR.y}`,
+          );
+          water.setAttribute("fill", "#bae6fd");
+          water.setAttribute("opacity", "0.5");
+          svg.appendChild(water);
         }
 
-        function drawWall(H, B, Ev, Es, Lp, Lt, hae, Pae, x_g, y_g, hasWater, Hw, hasButee, D, q, i_ang, Pws, Pwd) {
-            const svg = document.getElementById('wallSvg');
-            svg.innerHTML = '';
-            
-            const padding = 60;
-            const maxDimY = Math.max(H + Math.tan(toRad(i_ang)) * Lt + 1, Hw);
-            const maxDimX = Math.max(B + 2, B);
-            const maxDim = Math.max(maxDimY, maxDimX);
-            const scale = (500 - 2 * padding) / maxDim;
-            const oX = padding + 20; 
-            const oY = 500 - padding;
-            const p = (x, y) => ({ x: oX + x * scale, y: oY - y * scale });
-
-            const pToe = p(0, 0); const pHeel = p(B, 0); const pHeelTop = p(B, Es);
-            const pStemBR = p(Lp + Ev, Es); const pStemTR = p(Lp + Ev, H);
-            const pStemTL = p(Lp, H); const pStemBL = p(Lp, Es); const pToeTop = p(0, Es);
-
-            const pSoilSurfHeel = p(B, H + Math.tan(toRad(i_ang)) * Lt);
-
-            // Soil background
-            const soil = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
-            soil.setAttribute("points", `${pStemBR.x},${pStemBR.y} ${pHeelTop.x},${pHeelTop.y} ${pHeelTop.x},${pSoilSurfHeel.y} ${pStemTR.x},${pStemTR.y}`);
-            soil.setAttribute("fill", "#fef3c7"); 
-            soil.setAttribute("stroke", "#fcd34d");
-            svg.appendChild(soil);
-
-            // Draw Water
-            if (hasWater && Hw > 0) {
-                const pWaterSurf = p(B, Hw);
-                const water = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
-                water.setAttribute("points", `${pStemBR.x},${Math.max(pWaterSurf.y, pStemTR.y)} ${pWaterSurf.x},${pWaterSurf.y} ${pHeelTop.x},${pHeelTop.y} ${pStemBR.x},${pStemBR.y}`);
-                water.setAttribute("fill", "#bae6fd"); 
-                water.setAttribute("opacity", "0.5");
-                svg.appendChild(water);
-            }
-
-            // Draw Butée
-            if (hasButee && D > 0) {
-                const pButeeSurf = p(0, D);
-                const butee = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
-                butee.setAttribute("points", `${pToe.x - 40},${pButeeSurf.y} ${p(0,D).x},${p(0,D).y} ${pToeTop.x},${pToeTop.y} ${pToe.x},${pToe.y} ${pToe.x - 40},${pToe.y}`);
-                butee.setAttribute("fill", "#a7f3d0");
-                butee.setAttribute("opacity", "0.5");
-                svg.appendChild(butee);
-            }
-
-            // Wall
-            const wall = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
-            wall.setAttribute("points", `${pToe.x},${pToe.y} ${pHeel.x},${pHeel.y} ${pHeelTop.x},${pHeelTop.y} ${pStemBR.x},${pStemBR.y} ${pStemTR.x},${pStemTR.y} ${pStemTL.x},${pStemTL.y} ${pStemBL.x},${pStemBL.y} ${pToeTop.x},${pToeTop.y}`);
-            wall.setAttribute("fill", "#cbd5e1"); wall.setAttribute("stroke", "#475569"); wall.setAttribute("stroke-width", "2");
-            svg.appendChild(wall);
-
-            // Foundation base line
-            const lineF = document.createElementNS("http://www.w3.org/2000/svg", "line");
-            lineF.setAttribute("x1", oX - 40); lineF.setAttribute("y1", oY);
-            lineF.setAttribute("x2", oX + (B + 1.5) * scale); lineF.setAttribute("y2", oY);
-            lineF.setAttribute("stroke", "#475569"); lineF.setAttribute("stroke-width", "3");
-            svg.appendChild(lineF);
-
-            // Draw Slope Angle i
-            if (i_ang > 0) {
-                const iLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
-                iLine.setAttribute("x1", pStemTR.x); iLine.setAttribute("y1", pStemTR.y);
-                iLine.setAttribute("x2", pSoilSurfHeel.x); iLine.setAttribute("y2", pStemTR.y);
-                iLine.setAttribute("stroke", "#94a3b8"); iLine.setAttribute("stroke-width", "1"); iLine.setAttribute("stroke-dasharray", "4");
-                svg.appendChild(iLine);
-
-                const arc = document.createElementNS("http://www.w3.org/2000/svg", "path");
-                const r = 40;
-                const endX = pStemTR.x + r; const endY = pStemTR.y;
-                const startX = pStemTR.x + r * Math.cos(toRad(-i_ang));
-                const startY = pStemTR.y + r * Math.sin(toRad(-i_ang)); 
-                arc.setAttribute("d", `M ${endX} ${endY} A ${r} ${r} 0 0 0 ${startX} ${startY}`);
-                arc.setAttribute("fill", "none"); arc.setAttribute("stroke", "#475569"); arc.setAttribute("stroke-width", "1");
-                svg.appendChild(arc);
-                
-                const textI = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                textI.setAttribute("x", pStemTR.x + r + 10); textI.setAttribute("y", pStemTR.y - 10);
-                textI.setAttribute("fill", "#475569"); textI.setAttribute("font-size", "12"); textI.textContent = `i=${i_ang}°`;
-                svg.appendChild(textI);
-            }
-
-            // Arrow markers
-            const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
-            ['dc2626', '2563eb', 'ea580c', '0891b2', '0284c7', '9333ea'].forEach(color => {
-                const marker = document.createElementNS("http://www.w3.org/2000/svg", "marker");
-                marker.setAttribute("id", `arrowhead-${color}`);
-                marker.setAttribute("markerWidth", "10"); marker.setAttribute("markerHeight", "7");
-                marker.setAttribute("refX", "9"); marker.setAttribute("refY", "3.5"); marker.setAttribute("orient", "auto");
-                const polygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
-                polygon.setAttribute("points", "0 0, 10 3.5, 0 7"); polygon.setAttribute("fill", `#${color}`);
-                marker.appendChild(polygon); defs.appendChild(marker);
-            });
-            svg.appendChild(defs);
-
-            const createArrow = (x1, y1, x2, y2, color, label, lblOffsetX = 10, lblOffsetY = -10) => {
-                const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
-                const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-                line.setAttribute("x1", x1); line.setAttribute("y1", y1);
-                line.setAttribute("x2", x2); line.setAttribute("y2", y2);
-                line.setAttribute("stroke", color); line.setAttribute("stroke-width", "2.5");
-                line.setAttribute("marker-end", `url(#arrowhead-${color.replace('#','')})`);
-                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                text.setAttribute("x", x1 + (x2-x1)/2 + lblOffsetX); text.setAttribute("y", y1 + (y2-y1)/2 + lblOffsetY);
-                text.setAttribute("fill", color); text.setAttribute("font-size", "12"); text.setAttribute("font-weight", "bold"); text.textContent = label;
-                g.appendChild(line); g.appendChild(text); return g;
-            };
-
-            const cgSvg = p(x_g, y_g);
-            const cgCircle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-            cgCircle.setAttribute("cx", cgSvg.x); cgCircle.setAttribute("cy", cgSvg.y);
-            cgCircle.setAttribute("r", "5"); cgCircle.setAttribute("fill", "#1e293b");
-            svg.appendChild(cgCircle);
-            
-            svg.appendChild(createArrow(cgSvg.x, cgSvg.y, cgSvg.x, cgSvg.y + 40, "#2563eb", "W", 5, 20));
-            svg.appendChild(createArrow(cgSvg.x, cgSvg.y, cgSvg.x + 45, cgSvg.y, "#ea580c", "Fir", 5, -8));
-
-            const pForceApp = p(B, hae);
-            const delta = parseFloat(document.getElementById('inp_delta').value);
-            const fLen = 60;
-            const dx = fLen * Math.cos(toRad(delta));
-            const dy = fLen * Math.sin(toRad(delta));
-            svg.appendChild(createArrow(pForceApp.x + dx, pForceApp.y - dy, pForceApp.x, pForceApp.y, "#dc2626", "Pae", 10, -10));
-
-            if (hasWater && Hw > 0) {
-                if (Pws > 0) {
-                    const pWs = p(B, Hw / 3);
-                    svg.appendChild(createArrow(pWs.x + 50, pWs.y, pWs.x, pWs.y, "#0891b2", "Pws", 10, -5));
-                }
-                if (Pwd > 0) {
-                    const pWd = p(B, 0.6 * Hw);
-                    svg.appendChild(createArrow(pWd.x + 60, pWd.y, pWd.x, pWd.y, "#0284c7", "Pwd", 10, -5));
-                }
-            }
-
-            if (q > 0) {
-                const nbArrows = 4;
-                for (let j = 1; j <= nbArrows; j++) {
-                    const ratio = j / (nbArrows + 1);
-                    const physX = (Lp + Ev) + ratio * Lt;
-                    const physY = H + Math.tan(toRad(i_ang)) * ratio * Lt;
-                    const startP = p(physX, physY + 0.8); 
-                    const endP = p(physX, physY);
-                    svg.appendChild(createArrow(startP.x, startP.y, endP.x, endP.y, "#9333ea", "", 0, 0));
-                }
-                const labelPos = p((Lp + Ev) + 0.5 * Lt, H + Math.tan(toRad(i_ang)) * 0.5 * Lt + 1.2);
-                const qText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                qText.setAttribute("x", labelPos.x); qText.setAttribute("y", labelPos.y);
-                qText.setAttribute("fill", "#9333ea"); qText.setAttribute("font-size", "12"); qText.setAttribute("font-weight", "bold");
-                qText.setAttribute("text-anchor", "middle"); qText.textContent = "Charge q";
-                svg.appendChild(qText);
-            }
+        // Draw Butée
+        if (hasButee && D > 0) {
+          const pButeeSurf = p(0, D);
+          const butee = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "polygon",
+          );
+          butee.setAttribute(
+            "points",
+            `${pToe.x - 40},${pButeeSurf.y} ${p(0, D).x},${p(0, D).y} ${pToeTop.x},${pToeTop.y} ${pToe.x},${pToe.y} ${pToe.x - 40},${pToe.y}`,
+          );
+          butee.setAttribute("fill", "#a7f3d0");
+          butee.setAttribute("opacity", "0.5");
+          svg.appendChild(butee);
         }
 
-        function renderDetailedReport(d) {
-            const container = document.getElementById('detailsModule');
-            
-            const form_Kae = d.eqUsed === "10.28" ?
-                `\\[K_{ae} = \\frac{\\cos^2(\\phi' - \\theta - \\beta)}{\\cos\\theta \\cos^2\\beta \\cos(\\delta + \\beta + \\theta) \\left[ 1 + \\sqrt{\\frac{\\sin(\\phi' + \\delta) \\sin(\\phi' - \\theta - i)}{\\cos(\\delta + \\beta + \\theta) \\cos(\\beta - i)}} \\right]^2}\\]` :
-                `\\[K_{ae} = \\frac{\\cos^2(i - \\beta)}{\\cos(\\phi' - i) \\cos^2\\beta \\cos(\\delta + \\beta + \\phi' - i)}\\]`;
+        // Wall
+        const wall = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "polygon",
+        );
+        wall.setAttribute(
+          "points",
+          `${pToe.x},${pToe.y} ${pHeel.x},${pHeel.y} ${pHeelTop.x},${pHeelTop.y} ${pStemBR.x},${pStemBR.y} ${pStemTR.x},${pStemTR.y} ${pStemTL.x},${pStemTL.y} ${pStemBL.x},${pStemBL.y} ${pToeTop.x},${pToeTop.y}`,
+        );
+        wall.setAttribute("fill", "#cbd5e1");
+        wall.setAttribute("stroke", "#475569");
+        wall.setAttribute("stroke-width", "2");
+        svg.appendChild(wall);
 
-            let html = `
+        // Foundation base line
+        const lineF = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "line",
+        );
+        lineF.setAttribute("x1", oX - 40);
+        lineF.setAttribute("y1", oY);
+        lineF.setAttribute("x2", oX + (B + 1.5) * scale);
+        lineF.setAttribute("y2", oY);
+        lineF.setAttribute("stroke", "#475569");
+        lineF.setAttribute("stroke-width", "3");
+        svg.appendChild(lineF);
+
+        // Draw Slope Angle i
+        if (i_ang > 0) {
+          const iLine = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "line",
+          );
+          iLine.setAttribute("x1", pStemTR.x);
+          iLine.setAttribute("y1", pStemTR.y);
+          iLine.setAttribute("x2", pSoilSurfHeel.x);
+          iLine.setAttribute("y2", pStemTR.y);
+          iLine.setAttribute("stroke", "#94a3b8");
+          iLine.setAttribute("stroke-width", "1");
+          iLine.setAttribute("stroke-dasharray", "4");
+          svg.appendChild(iLine);
+
+          const arc = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "path",
+          );
+          const r = 40;
+          const endX = pStemTR.x + r;
+          const endY = pStemTR.y;
+          const startX = pStemTR.x + r * Math.cos(toRad(-i_ang));
+          const startY = pStemTR.y + r * Math.sin(toRad(-i_ang));
+          arc.setAttribute(
+            "d",
+            `M ${endX} ${endY} A ${r} ${r} 0 0 0 ${startX} ${startY}`,
+          );
+          arc.setAttribute("fill", "none");
+          arc.setAttribute("stroke", "#475569");
+          arc.setAttribute("stroke-width", "1");
+          svg.appendChild(arc);
+
+          const textI = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "text",
+          );
+          textI.setAttribute("x", pStemTR.x + r + 10);
+          textI.setAttribute("y", pStemTR.y - 10);
+          textI.setAttribute("fill", "#475569");
+          textI.setAttribute("font-size", "12");
+          textI.textContent = `i=${i_ang}°`;
+          svg.appendChild(textI);
+        }
+
+        // Arrow markers
+        const defs = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "defs",
+        );
+        ["dc2626", "2563eb", "ea580c", "0891b2", "0284c7", "9333ea"].forEach(
+          (color) => {
+            const marker = document.createElementNS(
+              "http://www.w3.org/2000/svg",
+              "marker",
+            );
+            marker.setAttribute("id", `arrowhead-${color}`);
+            marker.setAttribute("markerWidth", "10");
+            marker.setAttribute("markerHeight", "7");
+            marker.setAttribute("refX", "9");
+            marker.setAttribute("refY", "3.5");
+            marker.setAttribute("orient", "auto");
+            const polygon = document.createElementNS(
+              "http://www.w3.org/2000/svg",
+              "polygon",
+            );
+            polygon.setAttribute("points", "0 0, 10 3.5, 0 7");
+            polygon.setAttribute("fill", `#${color}`);
+            marker.appendChild(polygon);
+            defs.appendChild(marker);
+          },
+        );
+        svg.appendChild(defs);
+
+        const createArrow = (
+          x1,
+          y1,
+          x2,
+          y2,
+          color,
+          label,
+          lblOffsetX = 10,
+          lblOffsetY = -10,
+        ) => {
+          const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+          const line = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "line",
+          );
+          line.setAttribute("x1", x1);
+          line.setAttribute("y1", y1);
+          line.setAttribute("x2", x2);
+          line.setAttribute("y2", y2);
+          line.setAttribute("stroke", color);
+          line.setAttribute("stroke-width", "2.5");
+          line.setAttribute(
+            "marker-end",
+            `url(#arrowhead-${color.replace("#", "")})`,
+          );
+          const text = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "text",
+          );
+          text.setAttribute("x", x1 + (x2 - x1) / 2 + lblOffsetX);
+          text.setAttribute("y", y1 + (y2 - y1) / 2 + lblOffsetY);
+          text.setAttribute("fill", color);
+          text.setAttribute("font-size", "12");
+          text.setAttribute("font-weight", "bold");
+          text.textContent = label;
+          g.appendChild(line);
+          g.appendChild(text);
+          return g;
+        };
+
+        const cgSvg = p(x_g, y_g);
+        const cgCircle = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "circle",
+        );
+        cgCircle.setAttribute("cx", cgSvg.x);
+        cgCircle.setAttribute("cy", cgSvg.y);
+        cgCircle.setAttribute("r", "5");
+        cgCircle.setAttribute("fill", "#1e293b");
+        svg.appendChild(cgCircle);
+
+        svg.appendChild(
+          createArrow(
+            cgSvg.x,
+            cgSvg.y,
+            cgSvg.x,
+            cgSvg.y + 40,
+            "#2563eb",
+            "W",
+            5,
+            20,
+          ),
+        );
+        svg.appendChild(
+          createArrow(
+            cgSvg.x,
+            cgSvg.y,
+            cgSvg.x + 45,
+            cgSvg.y,
+            "#ea580c",
+            "Fir",
+            5,
+            -8,
+          ),
+        );
+
+        const pForceApp = p(B, hae);
+        const delta = parseFloat(document.getElementById("inp_delta").value);
+        const fLen = 60;
+        const dx = fLen * Math.cos(toRad(delta));
+        const dy = fLen * Math.sin(toRad(delta));
+        svg.appendChild(
+          createArrow(
+            pForceApp.x + dx,
+            pForceApp.y - dy,
+            pForceApp.x,
+            pForceApp.y,
+            "#dc2626",
+            "Pae",
+            10,
+            -10,
+          ),
+        );
+
+        if (hasWater && Hw > 0) {
+          if (Pws > 0) {
+            const pWs = p(B, Hw / 3);
+            svg.appendChild(
+              createArrow(
+                pWs.x + 50,
+                pWs.y,
+                pWs.x,
+                pWs.y,
+                "#0891b2",
+                "Pws",
+                10,
+                -5,
+              ),
+            );
+          }
+          if (Pwd > 0) {
+            const pWd = p(B, 0.6 * Hw);
+            svg.appendChild(
+              createArrow(
+                pWd.x + 60,
+                pWd.y,
+                pWd.x,
+                pWd.y,
+                "#0284c7",
+                "Pwd",
+                10,
+                -5,
+              ),
+            );
+          }
+        }
+
+        if (q > 0) {
+          const nbArrows = 4;
+          for (let j = 1; j <= nbArrows; j++) {
+            const ratio = j / (nbArrows + 1);
+            const physX = Lp + Ev + ratio * Lt;
+            const physY = H + Math.tan(toRad(i_ang)) * ratio * Lt;
+            const startP = p(physX, physY + 0.8);
+            const endP = p(physX, physY);
+            svg.appendChild(
+              createArrow(
+                startP.x,
+                startP.y,
+                endP.x,
+                endP.y,
+                "#9333ea",
+                "",
+                0,
+                0,
+              ),
+            );
+          }
+          const labelPos = p(
+            Lp + Ev + 0.5 * Lt,
+            H + Math.tan(toRad(i_ang)) * 0.5 * Lt + 1.2,
+          );
+          const qText = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "text",
+          );
+          qText.setAttribute("x", labelPos.x);
+          qText.setAttribute("y", labelPos.y);
+          qText.setAttribute("fill", "#9333ea");
+          qText.setAttribute("font-size", "12");
+          qText.setAttribute("font-weight", "bold");
+          qText.setAttribute("text-anchor", "middle");
+          qText.textContent = "Charge q";
+          svg.appendChild(qText);
+        }
+      }
+
+      function renderDetailedReport(d) {
+        const container = document.getElementById("detailsModule");
+
+        const form_Kae =
+          d.eqUsed === "10.28"
+            ? `\\[K_{ae} = \\frac{\\cos^2(\\phi' - \\theta - \\beta)}{\\cos\\theta \\cos^2\\beta \\cos(\\delta + \\beta + \\theta) \\left[ 1 + \\sqrt{\\frac{\\sin(\\phi' + \\delta) \\sin(\\phi' - \\theta - i)}{\\cos(\\delta + \\beta + \\theta) \\cos(\\beta - i)}} \\right]^2}\\]`
+            : `\\[K_{ae} = \\frac{\\cos^2(i - \\beta)}{\\cos(\\phi' - i) \\cos^2\\beta \\cos(\\delta + \\beta + \\phi' - i)}\\]`;
+
+        let html = `
                 <div class="flex items-center justify-between border-b-2 border-slate-300 pb-3 mb-8">
                     <h2 class="text-2xl font-bold text-slate-800"><i class="fa-solid fa-book-open text-blue-600 mr-3"></i>Annexe : Étapes de Calcul (Mur de Soutènement)</h2>
                 </div>
@@ -694,18 +1396,22 @@
                                 \\[k_v = \\pm ${Math.abs(d.kv_factor).toFixed(3)} k_h = \\pm ${Math.abs(d.kv_crit).toFixed(3)}\\]
                             </div>
 
-                            ${d.hasWater ? `
+                            ${
+                              d.hasWater
+                                ? `
                             <div class="step-header">7- Si présence d'eau; calcul \\(\\gamma', \\gamma_{sat}\\); pour calcul de: \\(\\theta\\) (Tableau 10.3)</div>
                             <div class="math-container bg-cyan-50/50 p-3 rounded-lg border border-cyan-100">
                                 \\[\\gamma_{eq} = \\left(\\frac{H_w}{H}\\right)^2 (\\gamma_{sat} - \\gamma_w) + \\left[1 - \\left(\\frac{H_w}{H}\\right)^2\\right] \\gamma = ${d.gamma_eq.toFixed(2)} \\text{ kN/m}^3\\]
                                 \\[\\gamma_{sat,eq} = \\left(\\frac{H_w}{H}\\right)^2 \\gamma_{sat} + \\left[1 - \\left(\\frac{H_w}{H}\\right)^2\\right] \\gamma = ${d.gamma_sat_eq.toFixed(2)} \\text{ kN/m}^3\\]
                             </div>
-                            ` : ''}
+                            `
+                                : ""
+                            }
 
                             <div class="step-header">2 & 3- Calcul: \\(\\theta, K_{ae}\\) (Équation ${d.eqUsed})</div>
                             <p class="text-sm italic ml-4 mb-3 text-slate-500">\\(K_{ae}\\) dépend de \\(\\theta\\) (Tableau 10.3) et de la condition \\(\\theta \\le (\\phi' - i)\\) : ${d.theta_deg.toFixed(2)}° \\(\\le\\) ${(d.phi - d.i_ang).toFixed(2)}°</p>
                             <div class="math-container bg-slate-50 p-3 rounded-lg border border-slate-100">
-                                \\[\\theta = \\arctan\\left(${d.hasWater ? '\\frac{\\gamma_{sat,eq}}{\\gamma_{eq}}' : ''} \\frac{k_h}{1 \\pm k_v}\\right) = ${d.theta_deg.toFixed(2)}^\\circ\\]
+                                \\[\\theta = \\arctan\\left(${d.hasWater ? "\\frac{\\gamma_{sat,eq}}{\\gamma_{eq}}" : ""} \\frac{k_h}{1 \\pm k_v}\\right) = ${d.theta_deg.toFixed(2)}^\\circ\\]
                                 ${form_Kae}
                                 \\[K_{ae} = ${d.Kae.toFixed(4)}\\]
                             </div>
@@ -721,18 +1427,22 @@
                                 \\[P_{ae} = \\frac{1}{2}\\gamma_{eq} \\left( 1 + \\frac{2 q \\cos\\beta}{\\gamma_{eq} H \\cos(\\beta - i)} \\right) H^2 (1 \\pm k_v) K_{ae} = ${d.Pae.toFixed(2)} \\text{ kN/m}\\]
                             </div>
 
-                            ${d.hasWater ? `
+                            ${
+                              d.hasWater
+                                ? `
                             <div class="step-header">5 & 6- Calcul \\(P_{wd}\\) et \\(P_{ws}\\) (Tableau 10.3)</div>
                             <div class="math-container bg-cyan-50/50 p-3 rounded-lg border border-cyan-100">
                                 \\[P_{ws} = \\frac{1}{2} \\gamma_w H_w^2 = ${d.Pws.toFixed(2)} \\text{ kN/m}\\]
-                                \\[P_{wd} = ${d.perm === 'impermeable' ? '\\frac{7}{12} k_h \\gamma_w H_w^2' : '0'} = ${d.Pwd.toFixed(2)} \\text{ kN/m}\\]
+                                \\[P_{wd} = ${d.perm === "impermeable" ? "\\frac{7}{12} k_h \\gamma_w H_w^2" : "0"} = ${d.Pwd.toFixed(2)} \\text{ kN/m}\\]
                             </div>
-                            ` : ''}
+                            `
+                                : ""
+                            }
 
                             <div class="step-header">9 & 11- Points d'application (\\(h_{ae}, H/3, 3H/5\\))</div>
                             <div class="math-container bg-slate-50 p-3 rounded-lg border border-slate-100">
                                 \\[h_{ae} = H \\left(\\frac{1}{2} - \\frac{1}{6} \\frac{P_a}{P_{ae}}\\right) = ${d.hae.toFixed(2)} \\text{ m}\\]
-                                ${d.hasWater ? `\\[h_{ws} = H_w / 3 = ${(d.Hw/3).toFixed(2)} \\text{ m}, \\quad h_{wd} = 3H_w / 5 = ${(0.6*d.Hw).toFixed(2)} \\text{ m}\\]` : ''}
+                                ${d.hasWater ? `\\[h_{ws} = H_w / 3 = ${(d.Hw / 3).toFixed(2)} \\text{ m}, \\quad h_{wd} = 3H_w / 5 = ${(0.6 * d.Hw).toFixed(2)} \\text{ m}\\]` : ""}
                             </div>
 
                             <div class="step-header">12- Poussée active dynamique globale \\(P_{ad}\\) (Équation 10.26)</div>
@@ -746,7 +1456,9 @@
                     </section>
 
                     <!-- SECTION B (Butée) -->
-                    ${d.hasButee ? `
+                    ${
+                      d.hasButee
+                        ? `
                     <section class="bg-white rounded border border-slate-200 shadow-sm overflow-hidden">
                         <h3 class="text-xl font-bold text-white bg-emerald-700 p-4 m-0">B. Calcul Poussée Passive Dynamique (\\(P_{dp}\\))</h3>
                         <div class="p-6">
@@ -764,7 +1476,9 @@
                             </div>
                         </div>
                     </section>
-                    ` : ''}
+                    `
+                        : ""
+                    }
 
                     <!-- SECTION C (Stabilité) -->
                     <section class="bg-white rounded border border-slate-200 shadow-sm overflow-hidden">
@@ -783,7 +1497,7 @@
                             <div>
                                 <h4 class="font-bold text-lg text-slate-800 border-b border-slate-200 pb-2 mb-4"><i class="fa-solid fa-arrows-left-right text-blue-500 mr-2"></i>2. Vérification au Glissement</h4>
                                 <div class="math-container bg-slate-50 p-4 rounded-lg border border-slate-200 text-sm">
-                                    \\[F_{motrice} = P_{ad,h} + F_{ir} = ${d.Pad_h.toFixed(2)} + ${(d.F_ir).toFixed(2)} = ${d.F_drive_h.toFixed(2)} \\text{ kN/m}\\]
+                                    \\[F_{motrice} = P_{ad,h} + F_{ir} = ${d.Pad_h.toFixed(2)} + ${d.F_ir.toFixed(2)} = ${d.F_drive_h.toFixed(2)} \\text{ kN/m}\\]
                                     \\[F_{resistante} = \\left[ W_{tot}(1 - |k_v|) + P_{ad,v} \\right] \\tan(\\phi_f) + c' B + P_{pd,h}\\]
                                     \\[FS_{glissement} = \\frac{F_{resistante}}{F_{motrice}} = \\frac{${d.R_slide.toFixed(2)}}{${d.F_drive_h.toFixed(2)}} = \\mathbf{${d.FS_slide.toFixed(2)}} \\ge 1.25\\]
                                 </div>
@@ -796,13 +1510,13 @@
                                     <div class="math-container bg-red-50/50 p-4 rounded-lg border border-red-100">
                                         <p class="font-semibold text-red-800 mb-3">Moment de renversement (\\(M_r\\)) :</p>
                                         \\[M_r = (P_{ae,h} \\cdot h_{ae}) + (F_{ir} \\cdot Y_G) + (P_{ws} \\cdot h_{ws}) + (P_{wd} \\cdot h_{wd})\\]
-                                        \\[M_r = ${(d.Pae_h*d.hae).toFixed(2)} + ${(d.F_ir*d.y_g).toFixed(2)} + ${(d.Pws*d.h_pws).toFixed(2)} + ${(d.Pwd*d.h_pwd).toFixed(2)} = \\mathbf{${d.M_drive.toFixed(2)} \\text{ kN.m/m}}\\]
+                                        \\[M_r = ${(d.Pae_h * d.hae).toFixed(2)} + ${(d.F_ir * d.y_g).toFixed(2)} + ${(d.Pws * d.h_pws).toFixed(2)} + ${(d.Pwd * d.h_pwd).toFixed(2)} = \\mathbf{${d.M_drive.toFixed(2)} \\text{ kN.m/m}}\\]
                                     </div>
 
                                     <div class="math-container bg-green-50/50 p-4 rounded-lg border border-green-100">
                                         <p class="font-semibold text-green-800 mb-3">Moment stabilisant (\\(M_s\\)) :</p>
                                         \\[M_s = \\sum \\left[ W_i \\cdot X_{G,i} \\cdot (1 - |k_v|) \\right] + (P_{ad,v} \\cdot B) + (P_{pd,h} \\cdot h_{pe})\\]
-                                        \\[M_s = ${(d.W_total*d.x_g * (1 - Math.abs(d.kv_factor*d.kh))).toFixed(2)} + ${(d.Pae_v*d.B).toFixed(2)} + ${(d.Ppd_h*d.hpe).toFixed(2)} = \\mathbf{${d.M_resist_exact.toFixed(2)} \\text{ kN.m/m}}\\]
+                                        \\[M_s = ${(d.W_total * d.x_g * (1 - Math.abs(d.kv_factor * d.kh))).toFixed(2)} + ${(d.Pae_v * d.B).toFixed(2)} + ${(d.Ppd_h * d.hpe).toFixed(2)} = \\mathbf{${d.M_resist_exact.toFixed(2)} \\text{ kN.m/m}}\\]
                                     </div>
                                 </div>
 
@@ -823,143 +1537,41 @@
                 </div>
             `;
 
-            container.innerHTML = html;
-            if (window.MathJax && window.MathJax.typesetPromise) {
-                MathJax.typesetPromise([container]).catch(console.error);
-            }
+        container.innerHTML = html;
+        if (window.MathJax && window.MathJax.typesetPromise) {
+          MathJax.typesetPromise([container]).catch(console.error);
         }
+      }
 
-        document.querySelectorAll('#calcForm input, #calcForm select').forEach(input => {
-            input.addEventListener('input', updateCalculations);
+      document
+        .querySelectorAll("#calcForm input, #calcForm select")
+        .forEach((input) => {
+          input.addEventListener("input", updateCalculations);
         });
-        document.getElementById('inp_hasWater').addEventListener('change', function() {
-            document.getElementById('water_inputs').classList.toggle('opacity-50', !this.checked);
-            document.getElementById('water_inputs').classList.toggle('pointer-events-none', !this.checked);
-            updateCalculations();
+      document
+        .getElementById("inp_hasWater")
+        .addEventListener("change", function () {
+          document
+            .getElementById("water_inputs")
+            .classList.toggle("opacity-50", !this.checked);
+          document
+            .getElementById("water_inputs")
+            .classList.toggle("pointer-events-none", !this.checked);
+          updateCalculations();
         });
-        document.getElementById('inp_hasButee').addEventListener('change', function() {
-            document.getElementById('butee_inputs').classList.toggle('opacity-50', !this.checked);
-            document.getElementById('butee_inputs').classList.toggle('pointer-events-none', !this.checked);
-            updateCalculations();
+      document
+        .getElementById("inp_hasButee")
+        .addEventListener("change", function () {
+          document
+            .getElementById("butee_inputs")
+            .classList.toggle("opacity-50", !this.checked);
+          document
+            .getElementById("butee_inputs")
+            .classList.toggle("pointer-events-none", !this.checked);
+          updateCalculations();
         });
 
-        window.onload = updateCalculations;
+      window.onload = updateCalculations;
     </script>
-
-    <!-- Firebase System pour les Compteurs -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, collection, onSnapshot, increment, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // =========================================================================
-        // 🔴 CONFIGURATION FIREBASE POUR VOTRE SITE WEB (À REMPLIR) 🔴
-        // 1. Allez sur https://console.firebase.google.com/ et créez un projet (gratuit).
-        // 2. Ajoutez une application Web (icône </>).
-        // 3. Dans le menu de gauche, activez "Firestore Database" (Mode test pour commencer).
-        // 4. Dans le menu de gauche, activez "Authentication", puis le mode "Anonyme".
-        // 5. Copiez vos clés et collez-les ci-dessous à la place des guillemets vides :
-        // =========================================================================
-        const maConfigProduction = {
-            apiKey: "",            // ex: "AIzaSyB-..."
-            authDomain: "",        // ex: "mon-projet.firebaseapp.com"
-            projectId: "",         // ex: "mon-projet"
-            storageBucket: "",     // ex: "mon-projet.appspot.com"
-            messagingSenderId: "", // ex: "123456789"
-            appId: ""              // ex: "1:123456:web:abcde"
-        };
-        // =========================================================================
-
-        const isTestEnv = typeof __firebase_config !== 'undefined';
-        const firebaseConfig = isTestEnv ? JSON.parse(__firebase_config) : maConfigProduction;
-        const currentAppId = isTestEnv && typeof __app_id !== 'undefined' ? __app_id : 'geowall-pro-app';
-
-        // Vérifie si la configuration est remplie (ou si on est dans l'environnement de test interne)
-        if (firebaseConfig && (firebaseConfig.apiKey !== "" || isTestEnv)) {
-            const app = initializeApp(firebaseConfig);
-            const auth = getAuth(app);
-            const db = getFirestore(app);
-
-            // Définition des chemins dynamiques selon l'environnement
-            const statsPath = isTestEnv ? `artifacts/${currentAppId}/public/data/stats` : 'stats';
-            const onlinePath = isTestEnv ? `artifacts/${currentAppId}/public/data/online_users` : 'online_users';
-
-            const initAuth = async () => {
-                try {
-                    if (isTestEnv && typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                        await signInWithCustomToken(auth, __initial_auth_token);
-                    } else {
-                        await signInAnonymously(auth); // Utilisé pour vos vrais visiteurs
-                    }
-                } catch (error) {
-                    console.error("Erreur d'authentification primaire:", error);
-                    // Tentative de secours
-                    try { await signInAnonymously(auth); } catch (e) { console.error("Échec auth anonyme:", e); }
-                }
-            };
-
-            initAuth();
-
-            onAuthStateChanged(auth, (user) => {
-                if (!user) return;
-
-                const statsDocRef = doc(db, statsPath, 'global');
-                const onlineUsersRef = collection(db, onlinePath);
-                const myOnlineDocRef = doc(db, onlinePath, user.uid);
-
-                // 1. GESTION DU TOTAL DES VISITES
-                if (!localStorage.getItem('geowall_visited')) {
-                    setDoc(statsDocRef, { total: increment(1) }, { merge: true }).catch(console.error);
-                    localStorage.setItem('geowall_visited', 'true');
-                }
-
-                onSnapshot(statsDocRef, (docSnap) => {
-                    if (docSnap.exists() && docSnap.data().total) {
-                        document.getElementById('totalCount').innerText = docSnap.data().total;
-                    }
-                }, (err) => console.error("Erreur de lecture du total:", err));
-
-                // 2. GESTION DES UTILISATEURS EN LIGNE
-                const updateOnlineStatus = () => {
-                    setDoc(myOnlineDocRef, { lastActive: Date.now() }, { merge: true }).catch(console.error);
-                };
-                
-                updateOnlineStatus(); // Premier appel
-                setInterval(updateOnlineStatus, 20000); 
-
-                window.addEventListener('beforeunload', () => {
-                    deleteDoc(myOnlineDocRef).catch(console.error);
-                });
-
-                const activeUsersMap = new Map();
-                const updateOnlineUI = () => {
-                    const now = Date.now();
-                    let count = 0;
-                    activeUsersMap.forEach((lastActive, id) => {
-                        if (now - lastActive < 45000) count++;
-                    });
-                    document.getElementById('onlineCount').innerText = Math.max(1, count);
-                };
-
-                onSnapshot(onlineUsersRef, (snapshot) => {
-                    snapshot.docChanges().forEach((change) => {
-                        if (change.type === "removed") {
-                            activeUsersMap.delete(change.doc.id);
-                        } else {
-                            activeUsersMap.set(change.doc.id, change.doc.data().lastActive);
-                        }
-                    });
-                    updateOnlineUI();
-                }, (err) => console.error("Erreur de lecture en ligne:", err));
-
-                setInterval(updateOnlineUI, 5000);
-            });
-        } else {
-            // Mode démo si la configuration n'est pas encore remplie par vous
-            document.getElementById('onlineCount').innerText = "1";
-            document.getElementById('totalCount').innerText = "1";
-            console.warn("⚠️ BASE DE DONNÉES NON CONNECTÉE : Veuillez remplir 'maConfigProduction' avec vos clés Firebase pour que le compteur fonctionne sur votre site web.");
-        }
-    </script>
-</body>
+  </body>
 </html>
