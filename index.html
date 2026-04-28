@@ -852,29 +852,49 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, collection, onSnapshot, increment, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'geowall-pro-app';
-        let firebaseConfig = null;
-        
-        try {
-            firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
-        } catch (e) {
-            console.error("Erreur de configuration Firebase", e);
-        }
+        // =========================================================================
+        // 🔴 CONFIGURATION FIREBASE POUR VOTRE SITE WEB (À REMPLIR) 🔴
+        // 1. Allez sur https://console.firebase.google.com/ et créez un projet (gratuit).
+        // 2. Ajoutez une application Web (icône </>).
+        // 3. Dans le menu de gauche, activez "Firestore Database" (Mode test pour commencer).
+        // 4. Dans le menu de gauche, activez "Authentication", puis le mode "Anonyme".
+        // 5. Copiez vos clés et collez-les ci-dessous à la place des guillemets vides :
+        // =========================================================================
+        const maConfigProduction = {
+            apiKey: "",            // ex: "AIzaSyB-..."
+            authDomain: "",        // ex: "mon-projet.firebaseapp.com"
+            projectId: "",         // ex: "mon-projet"
+            storageBucket: "",     // ex: "mon-projet.appspot.com"
+            messagingSenderId: "", // ex: "123456789"
+            appId: ""              // ex: "1:123456:web:abcde"
+        };
+        // =========================================================================
 
-        if (firebaseConfig && Object.keys(firebaseConfig).length > 0) {
+        const isTestEnv = typeof __firebase_config !== 'undefined';
+        const firebaseConfig = isTestEnv ? JSON.parse(__firebase_config) : maConfigProduction;
+        const currentAppId = isTestEnv && typeof __app_id !== 'undefined' ? __app_id : 'geowall-pro-app';
+
+        // Vérifie si la configuration est remplie (ou si on est dans l'environnement de test interne)
+        if (firebaseConfig && (firebaseConfig.apiKey !== "" || isTestEnv)) {
             const app = initializeApp(firebaseConfig);
             const auth = getAuth(app);
             const db = getFirestore(app);
 
+            // Définition des chemins dynamiques selon l'environnement
+            const statsPath = isTestEnv ? `artifacts/${currentAppId}/public/data/stats` : 'stats';
+            const onlinePath = isTestEnv ? `artifacts/${currentAppId}/public/data/online_users` : 'online_users';
+
             const initAuth = async () => {
                 try {
-                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    if (isTestEnv && typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                         await signInWithCustomToken(auth, __initial_auth_token);
                     } else {
-                        await signInAnonymously(auth);
+                        await signInAnonymously(auth); // Utilisé pour vos vrais visiteurs
                     }
                 } catch (error) {
-                    console.error("Erreur d'authentification:", error);
+                    console.error("Erreur d'authentification primaire:", error);
+                    // Tentative de secours
+                    try { await signInAnonymously(auth); } catch (e) { console.error("Échec auth anonyme:", e); }
                 }
             };
 
@@ -883,12 +903,11 @@
             onAuthStateChanged(auth, (user) => {
                 if (!user) return;
 
-                const statsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'stats', 'global');
-                const onlineUsersRef = collection(db, 'artifacts', appId, 'public', 'data', 'online_users');
-                const myOnlineDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'online_users', user.uid);
+                const statsDocRef = doc(db, statsPath, 'global');
+                const onlineUsersRef = collection(db, onlinePath);
+                const myOnlineDocRef = doc(db, onlinePath, user.uid);
 
                 // 1. GESTION DU TOTAL DES VISITES
-                // Utilisation de localStorage pour éviter d'incrémenter à chaque nouvel onglet
                 if (!localStorage.getItem('geowall_visited')) {
                     setDoc(statsDocRef, { total: increment(1) }, { merge: true }).catch(console.error);
                     localStorage.setItem('geowall_visited', 'true');
@@ -906,31 +925,22 @@
                 };
                 
                 updateOnlineStatus(); // Premier appel
-                // Mise à jour de notre propre statut toutes les 20 secondes
                 setInterval(updateOnlineStatus, 20000); 
 
-                // Tenter de nettoyer lors de la fermeture (ne fonctionne pas toujours sur mobile)
                 window.addEventListener('beforeunload', () => {
                     deleteDoc(myOnlineDocRef).catch(console.error);
                 });
 
-                // Dictionnaire local pour stocker l'état de tous les utilisateurs détectés
                 const activeUsersMap = new Map();
-
                 const updateOnlineUI = () => {
                     const now = Date.now();
                     let count = 0;
                     activeUsersMap.forEach((lastActive, id) => {
-                        // On considère quelqu'un hors-ligne après 45 secondes d'inactivité
-                        if (now - lastActive < 45000) {
-                            count++;
-                        }
+                        if (now - lastActive < 45000) count++;
                     });
-                    // Toujours afficher au moins 1 (soi-même)
                     document.getElementById('onlineCount').innerText = Math.max(1, count);
                 };
 
-                // Écouter les modifications de Firebase
                 onSnapshot(onlineUsersRef, (snapshot) => {
                     snapshot.docChanges().forEach((change) => {
                         if (change.type === "removed") {
@@ -942,14 +952,13 @@
                     updateOnlineUI();
                 }, (err) => console.error("Erreur de lecture en ligne:", err));
 
-                // Rafraîchir l'interface localement toutes les 5 secondes
-                // (Cela purge visuellement ceux qui ont expiré, sans dépendre d'un événement Firebase)
                 setInterval(updateOnlineUI, 5000);
             });
         } else {
-            // Mode démo si la base de données n'est pas connectée
+            // Mode démo si la configuration n'est pas encore remplie par vous
             document.getElementById('onlineCount').innerText = "1";
             document.getElementById('totalCount').innerText = "1";
+            console.warn("⚠️ BASE DE DONNÉES NON CONNECTÉE : Veuillez remplir 'maConfigProduction' avec vos clés Firebase pour que le compteur fonctionne sur votre site web.");
         }
     </script>
 </body>
