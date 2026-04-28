@@ -887,45 +887,64 @@
                 const onlineUsersRef = collection(db, 'artifacts', appId, 'public', 'data', 'online_users');
                 const myOnlineDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'online_users', user.uid);
 
-                // Incrémenter le total des visites (une seule fois par session locale)
-                if (!sessionStorage.getItem('hasVisited')) {
+                // 1. GESTION DU TOTAL DES VISITES
+                // Utilisation de localStorage pour éviter d'incrémenter à chaque nouvel onglet
+                if (!localStorage.getItem('geowall_visited')) {
                     setDoc(statsDocRef, { total: increment(1) }, { merge: true }).catch(console.error);
-                    sessionStorage.setItem('hasVisited', 'true');
+                    localStorage.setItem('geowall_visited', 'true');
                 }
 
-                // Écouter le compteur global en temps réel
                 onSnapshot(statsDocRef, (docSnap) => {
                     if (docSnap.exists() && docSnap.data().total) {
                         document.getElementById('totalCount').innerText = docSnap.data().total;
                     }
                 }, (err) => console.error("Erreur de lecture du total:", err));
 
-                // Mettre à jour le statut "En ligne"
+                // 2. GESTION DES UTILISATEURS EN LIGNE
                 const updateOnlineStatus = () => {
                     setDoc(myOnlineDocRef, { lastActive: Date.now() }, { merge: true }).catch(console.error);
                 };
                 
                 updateOnlineStatus(); // Premier appel
-                setInterval(updateOnlineStatus, 30000); // Mise à jour toutes les 30 secondes
+                // Mise à jour de notre propre statut toutes les 20 secondes
+                setInterval(updateOnlineStatus, 20000); 
 
-                // Supprimer la session si l'utilisateur ferme l'onglet
+                // Tenter de nettoyer lors de la fermeture (ne fonctionne pas toujours sur mobile)
                 window.addEventListener('beforeunload', () => {
                     deleteDoc(myOnlineDocRef).catch(console.error);
                 });
 
-                // Écouter les utilisateurs actifs
-                onSnapshot(onlineUsersRef, (snapshot) => {
+                // Dictionnaire local pour stocker l'état de tous les utilisateurs détectés
+                const activeUsersMap = new Map();
+
+                const updateOnlineUI = () => {
                     const now = Date.now();
                     let count = 0;
-                    snapshot.forEach(d => {
-                        const data = d.data();
-                        // Considérer en ligne s'il y a eu une activité dans les 2 dernières minutes (120000 ms)
-                        if (data.lastActive && (now - data.lastActive) < 120000) {
+                    activeUsersMap.forEach((lastActive, id) => {
+                        // On considère quelqu'un hors-ligne après 45 secondes d'inactivité
+                        if (now - lastActive < 45000) {
                             count++;
                         }
                     });
-                    document.getElementById('onlineCount').innerText = count;
-                }, (err) => console.error("Erreur de lecture des utilisateurs en ligne:", err));
+                    // Toujours afficher au moins 1 (soi-même)
+                    document.getElementById('onlineCount').innerText = Math.max(1, count);
+                };
+
+                // Écouter les modifications de Firebase
+                onSnapshot(onlineUsersRef, (snapshot) => {
+                    snapshot.docChanges().forEach((change) => {
+                        if (change.type === "removed") {
+                            activeUsersMap.delete(change.doc.id);
+                        } else {
+                            activeUsersMap.set(change.doc.id, change.doc.data().lastActive);
+                        }
+                    });
+                    updateOnlineUI();
+                }, (err) => console.error("Erreur de lecture en ligne:", err));
+
+                // Rafraîchir l'interface localement toutes les 5 secondes
+                // (Cela purge visuellement ceux qui ont expiré, sans dépendre d'un événement Firebase)
+                setInterval(updateOnlineUI, 5000);
             });
         } else {
             // Mode démo si la base de données n'est pas connectée
